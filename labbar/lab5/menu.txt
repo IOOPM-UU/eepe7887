@@ -1,0 +1,6 @@
+[L]ägga till en vara
+[T]a bort en vara
+[R]edigera en vara
+Ån[g]ra senaste ändringen
+Lista [h]ela varukatalogen
+[A]vsluta

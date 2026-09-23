@@ -15,6 +15,7 @@
 
 typedef struct hash_table ioopm_hash_table_t;
 
+
 /// @brief Create a new hash table
 /// @return A new empty hash table
 ioopm_hash_table_t *ioopm_hash_table_create(void);
@@ -40,3 +41,12 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, char *key, int *result);
 /// @param key key to remove
 /// @return the value mapped to by key (FIXME: what if the key does not exist?)
 bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key);
+
+// TODO: documentation
+bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, char *key);
+
+// TODO: documentation
+bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht);
+
+// TODO: documentation
+int ioopm_hash_table_size(ioopm_hash_table_t *ht);

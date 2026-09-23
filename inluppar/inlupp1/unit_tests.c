@@ -32,6 +32,19 @@ void test_insert_once()
   ioopm_hash_table_destroy(ht);
 }
 
+void test_remove_entry()
+{
+  int result = 3;
+  char *key = "abc";
+  int value = 123;
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_insert(ht, key, value);
+  ioopm_hash_table_remove(ht, key);
+  CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key, &result));
+  ioopm_hash_table_destroy(ht);
+
+}
+
 void test_is_number(void) {
   CU_ASSERT_TRUE(is_number("42"));
   CU_ASSERT_TRUE(is_number("-10"));
@@ -59,7 +72,8 @@ int main() {
   if (
     ((CU_add_test(my_test_suite, "Basic tests of is_number", test_is_number) == NULL) || 
     (CU_add_test(my_test_suite, "Test create/destroy", test_create_destroy) == NULL) ||
-    (CU_add_test(my_test_suite, "Test insert once", test_insert_once) == NULL) )
+    (CU_add_test(my_test_suite, "Test insert once", test_insert_once) == NULL) ||
+    (CU_add_test(my_test_suite, "Test insert and remove once", test_remove_entry) == NULL))
   )
     {
       // If adding any of the tests fails, we tear down CUnit and exit

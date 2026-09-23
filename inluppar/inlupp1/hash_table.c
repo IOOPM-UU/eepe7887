@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#define No_Buckets 17
 
 typedef struct entry entry_t;
 
@@ -15,9 +16,8 @@ struct entry
 
 struct hash_table
 {
-  // DODGE: hard-coding number of buckets as 17.
   // NOTE: addressing this dodge is optional.
-  entry_t buckets[17];
+  entry_t buckets[No_Buckets];
 };
 
 static size_t string_knr_hash(const char *str)
@@ -44,15 +44,22 @@ ioopm_hash_table_t *ioopm_hash_table_create(void) {
     return calloc(1, sizeof(ioopm_hash_table_t));
 }
 
+entry_t *destroy_entry(entry_t *entry)
+ {
+  entry_t *next = entry->next;
+  free(entry);
+  entry = next;
+  return entry;
+ }
+
+
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
- for (size_t i = 0; i < 17; i++)
+ for (size_t i = 0; i < No_Buckets; i++)
   {
     entry_t *current = ht->buckets[i].next;
     while (current != NULL)
     {
-      entry_t *next = current->next;
-      free(current);
-      current = next;
+      current = destroy_entry(current);
     }
   }
    free(ht);
@@ -61,7 +68,7 @@ void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
 
 entry_t *find_previous_entry(ioopm_hash_table_t *ht, char *key)
 {
-  size_t bucket = string_knr_hash(key) % 17;
+  size_t bucket = string_knr_hash(key) % No_Buckets;
   
   entry_t *previous = &ht->buckets[bucket];
   entry_t *current = ht->buckets[bucket].next;
@@ -105,6 +112,24 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, char *key, int *result)
 
 
   else
+  {
+    return false;
+  }
+}
+
+bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key)
+{
+  int result = 0;
+  entry_t *previous = find_previous_entry(ht, key);
+  
+
+  if (ioopm_hash_table_lookup(ht, key, &result))
+  {
+    previous->next = destroy_entry(previous->next);
+    
+    return true;
+  }
+  else 
   {
     return false;
   }

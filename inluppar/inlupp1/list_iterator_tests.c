@@ -11,9 +11,11 @@ void test_create_empty_it()
     ioopm_list_t *list = ioopm_list_create();
     ioopm_list_iterator_t *iter = ioopm_list_iterator_create(list);
 
-    bool end_sentinel = ioopm_list_iterator_advance(iter);
-    CU_ASSERT_TRUE(end_sentinel);
+    bool sentinel = ioopm_list_iterator_advance(iter);
+    CU_ASSERT_TRUE(sentinel);
+
     CU_ASSERT_FALSE(ioopm_list_iterator_advance(iter));
+    
     ioopm_list_iterator_destroy(iter);
     ioopm_list_destroy(list);
 }
@@ -24,7 +26,6 @@ void test_iter_on_list()
     ioopm_list_t *list = ioopm_list_create();
     ioopm_list_iterator_t *iter = ioopm_list_iterator_create(list);
     ioopm_list_iterator_insert(iter, value);
-    ioopm_list_iterator_advance(iter);
     int current_value = ioopm_list_iterator_current(iter);
     CU_ASSERT_EQUAL(current_value, value);
     ioopm_list_iterator_destroy(iter);
@@ -39,12 +40,11 @@ void test_iter_advance()
     ioopm_list_iterator_t *iter = ioopm_list_iterator_create(list);
     ioopm_list_iterator_insert(iter, value_1);
     ioopm_list_iterator_insert(iter, value_2);
-    ioopm_list_iterator_advance(iter);
     int first_value = ioopm_list_iterator_current(iter);
     ioopm_list_iterator_advance(iter);
     int second_value = ioopm_list_iterator_current(iter);
-    CU_ASSERT_EQUAL(first_value, value_2);
-    CU_ASSERT_EQUAL(second_value, value_1);
+    CU_ASSERT_EQUAL(first_value, value_1);
+    CU_ASSERT_EQUAL(second_value, value_2);
     ioopm_list_iterator_destroy(iter);
     ioopm_list_destroy(list);    
 
@@ -62,11 +62,10 @@ void test_iter_remove_and_insert()
     ioopm_list_iterator_t *iter = ioopm_list_iterator_create(list);
     ioopm_list_iterator_insert(iter, value_1);
     ioopm_list_iterator_insert(iter, value_2);
-    ioopm_list_iterator_advance(iter);
     int current_value = ioopm_list_iterator_current(iter);
-    CU_ASSERT_EQUAL(current_value, value_2);
+    CU_ASSERT_EQUAL(current_value, value_1);
     ioopm_list_iterator_remove(iter);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(iter), value_1);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(iter), value_2);
     ioopm_list_iterator_insert(iter, value_3);
     ioopm_list_iterator_insert(iter, value_4);
     ioopm_list_iterator_advance(iter);

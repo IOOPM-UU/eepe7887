@@ -239,9 +239,15 @@ void ioopm_list_iterator_insert(ioopm_list_iterator_t *iter, int element)
 {
     link_t *current_link = iter->link;
     link_t *new_link =link_create(element, current_link, current_link->next);
-    
+
     current_link->next = new_link;
     current_link->next->previous = new_link;
+
+    if(current_link == iter->list->first)
+    {
+        iter->link = new_link;
+    }
+
     iter->list->size = iter->list->size + 1;
 
 }

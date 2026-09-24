@@ -130,7 +130,7 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key)
   int result = 0;
   entry_t *previous = find_previous_entry(ht, key);
   
-
+  
   if (ioopm_hash_table_lookup(ht, key, &result))
   {
     previous->next = destroy_entry(previous->next);

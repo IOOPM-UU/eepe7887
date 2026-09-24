@@ -20,7 +20,7 @@ bool ioopm_list_iterator_at_end(ioopm_list_iterator_t *iter);
 
 /// @brief Step the iterator forward one step
 /// @param iter the iterator
-void ioopm_list_iterator_advance(ioopm_list_iterator_t *iter);
+bool ioopm_list_iterator_advance(ioopm_list_iterator_t *iter);
 
 /// @brief Return the current element from the underlying list
 /// @param iter the iterator

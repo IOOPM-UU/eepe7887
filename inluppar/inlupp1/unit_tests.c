@@ -35,6 +35,34 @@ void test_insert_once()
   ioopm_hash_table_destroy(ht);
 }
 
+void test_insert_inuse()
+{
+  // create new hash table
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  char *key = "abc";
+  int value = 123;
+  int value2 = 456;
+
+  // check that key is not in ht
+  int result = 0;
+  CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key, &result));
+  CU_ASSERT_EQUAL(result, 0);
+
+  // insert key-value pair and check that the mapping exists
+  ioopm_hash_table_insert(ht, key, value);
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key, &result));
+  CU_ASSERT_EQUAL(result, value);
+
+  result = 0;
+  ioopm_hash_table_insert(ht, key, value2);
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key, &result));
+  CU_ASSERT_EQUAL(result, value2);
+  
+  // destroy hash table
+  ioopm_hash_table_destroy(ht);
+}
+
 void test_remove_entry()
 {
   int result = 3;
@@ -44,6 +72,20 @@ void test_remove_entry()
   ioopm_hash_table_insert(ht, key, value);
   ioopm_hash_table_remove(ht, key);
   CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key, &result));
+  ioopm_hash_table_destroy(ht);
+
+}
+
+void test_remove_noexist_entry()
+{
+  int result = 3;
+  char *key = "abc";
+  char *key_noexist = "bcc";
+  int value = 123;
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_insert(ht, key, value);
+  CU_ASSERT_FALSE(ioopm_hash_table_remove(ht, key_noexist));
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key, &result));
   ioopm_hash_table_destroy(ht);
 
 }
@@ -335,7 +377,10 @@ int main() {
     (CU_add_test(my_test_suite, "Test iterate hash once", test_iterate_hash_once) == NULL) ||
     (CU_add_test(my_test_suite, "Test iterate severel", test_iterator_several_entries) == NULL) ||
     (CU_add_test(my_test_suite, "Test visit ince", test_iterator_entries_visited_once) == NULL) ||
-    (CU_add_test(my_test_suite, "Test entries in same bucket", test_entries_in_same_bucket) == NULL)
+    (CU_add_test(my_test_suite, "Test entries in same bucket", test_entries_in_same_bucket) == NULL) ||
+    (CU_add_test(my_test_suite, "Test remove no exist", test_remove_noexist_entry) == NULL) ||
+    (CU_add_test(my_test_suite, "Test insert inuse", test_insert_inuse) == NULL)
+
   )
   )
     {

@@ -16,7 +16,7 @@ struct entry {
 struct hash_table {
     //DODGE: hard-docing number of buckets as 17
     //NOTE: addressing this dodge is optional
-    entry_t buckets[17];                                    //Kan använda en variabel istället för 17 för att slippa hardcodad storlek
+    entry_t buckets[17];                                    //PROBLEM Kan använda en variabel istället för 17 för att slippa hardcodad storlek
 };
 
 struct hash_table_iterator
@@ -42,7 +42,7 @@ ioopm_hash_table_t *ioopm_hash_table_create(void) {
 }
 
 static entry_t *entry_create(char *key, int value, entry_t *next) {
-    entry_t *entry = malloc(sizeof(entry_t));                       //Skulle kunna använda calloc för att vara säker på att slippa unpredictable behaviour.
+    entry_t *entry = malloc(sizeof(entry_t));                       //PROBLEM Skulle kunna använda calloc för att vara säker på att slippa unpredictable behaviour.
 
     entry->key = key;
     entry->value = value;
@@ -80,7 +80,7 @@ static entry_t *find_previous_entry(ioopm_hash_table_t *ht, char *key) {
     entry_t *current = previous->next;
 
     while (current != NULL && strcmp(current->key, key) != 0) {
-        if (current->next != NULL) {  //Onödig if/else sats i denna funktion. På grund av if-satsen i lookup och insert.
+        if (current->next != NULL) {  //PROBLEM Onödig if/else sats. På grund av if-satsen i lookup och insert.
             previous = current;
             current = current->next;
         } else {
@@ -118,7 +118,7 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, char *key, int *result) {
 bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key, int *result) {
 
     entry_t *previous = find_previous_entry(ht, key);
-    entry_t *current = previous->next;                  //Kan använda någon tidigare funktion för att se om noden existerar, städa upp koden!
+    entry_t *current = previous->next;                  //PROBLEM Kan använda lookup funktion för att se om noden existerar. Kortare kod och mer läsbart då!
 
     //check if find_previous returned the last entry
     if (previous->next != NULL) {           
@@ -164,7 +164,7 @@ int ioopm_hash_table_size(ioopm_hash_table_t *ht) {
     return size;
 }
 
-bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht) {            //Blir väldigt hög tidskomplexitet med denna lösning. (varje buckets första entry finns i början av bucketen)
+bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht) {            //PROBLEM Blir väldigt hög tidskomplexitet med denna lösning. (varje buckets första entry finns i början av bucketen)
     if (ioopm_hash_table_size(ht) != 0) {
         return false;
     } else {

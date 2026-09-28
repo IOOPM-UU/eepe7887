@@ -24,7 +24,7 @@ struct hash_table
 struct hash_table_iterator
 {
   ioopm_hash_table_t *ht;
-  int current_bucket;
+  size_t current_bucket;
   entry_t *current_entry;
 };
 
@@ -118,7 +118,6 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, char *key, int *result)
     return true;
   }
 
-
   else
   {
     return false;
@@ -169,10 +168,10 @@ bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht)
 }
 
 // TODO: documentation
-int ioopm_hash_table_size(ioopm_hash_table_t *ht)
+size_t ioopm_hash_table_size(ioopm_hash_table_t *ht)
 {
   
-  int size = 0;
+  size_t size = 0;
 
   for(int i = 0; i < No_Buckets; i++)
   {
@@ -189,17 +188,6 @@ int ioopm_hash_table_size(ioopm_hash_table_t *ht)
 
 
 
-/**
-* @file hash_table_iterator.h
-* @author Alex Egeberg, Eemeli Peura
-* @date 1 Sep 2022
-* @brief Simple hash table iterator
-*
-* Hash table iterators provide an interface to iterate through all entries in a hash table.
-* An iterator is either positioned at an entry, called the current entry, or it is positioned at-the-end, if it has already iterated through all entries.
-* If the underlying hash table of an iterator is modified using any non-iterator function, the iterator is invalidated and should not be used anymore.
-*
-*/
 
 typedef struct hash_table_iterator ioopm_hash_table_iterator_t;
 

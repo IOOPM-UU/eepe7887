@@ -78,11 +78,12 @@ void test_append_prepend_insert()
     int value2 = 13; // prependas först
     int value3 = 7;  // insertas i mitten
 
+    size_t one = 1;
     ioopm_list_t *list = ioopm_list_create();
 
     ioopm_list_append(list, value1);   // list: [12]
     ioopm_list_prepend(list, value2);  // list: [13, 12]
-    ioopm_list_insert(list, 1, value3); // list: [13, 7, 12]
+    ioopm_list_insert(list, one, value3); // list: [13, 7, 12]
 
     int first = ioopm_list_get(list, 0);
     int middle = ioopm_list_get(list, 1);

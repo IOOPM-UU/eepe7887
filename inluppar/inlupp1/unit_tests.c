@@ -3,6 +3,11 @@
 #include <CUnit/Basic.h>
 #include "utils.h"
 #define No_Buckets 17
+#define int_elem(x)   ((elem_t) { .i = (x) })
+#define bool_elem(x)  ((elem_t) { .b = (x) })
+#define ptr_elem(x)   ((elem_t) { .p = (x) })
+#define string_elem(x) ((elem_t) { .s = (x) })
+
 
 
 
@@ -19,17 +24,17 @@ void test_insert_once()
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
 
   char *key = "abc";
-  int value = 123;
+  elem_t value = int_elem(123);
 
   // check that key is not in ht
-  int result = 0;
+  elem_t result = int_elem(0);
   CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key, &result));
-  CU_ASSERT_EQUAL(result, 0);
+  CU_ASSERT_EQUAL(result.i, 0);
 
   // insert key-value pair and check that the mapping exists
   ioopm_hash_table_insert(ht, key, value);
   CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key, &result));
-  CU_ASSERT_EQUAL(result, value);
+  CU_ASSERT_EQUAL(result.i, value.i);
 
   // destroy hash table
   ioopm_hash_table_destroy(ht);
@@ -41,23 +46,23 @@ void test_insert_inuse()
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
 
   char *key = "abc";
-  int value = 123;
-  int value2 = 456;
+  elem_t value = int_elem(123);
+  elem_t value2 = int_elem(456);
 
   // check that key is not in ht
-  int result = 0;
+  elem_t result = int_elem(0);
   CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key, &result));
-  CU_ASSERT_EQUAL(result, 0);
+  CU_ASSERT_EQUAL(result.i, 0);
 
   // insert key-value pair and check that the mapping exists
   ioopm_hash_table_insert(ht, key, value);
   CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key, &result));
-  CU_ASSERT_EQUAL(result, value);
+  CU_ASSERT_EQUAL(result.i, value.i);
 
-  result = 0;
+  result.i = 0;
   ioopm_hash_table_insert(ht, key, value2);
   CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key, &result));
-  CU_ASSERT_EQUAL(result, value2);
+  CU_ASSERT_EQUAL(result.i, value2.i);
   
   // destroy hash table
   ioopm_hash_table_destroy(ht);
@@ -65,9 +70,9 @@ void test_insert_inuse()
 
 void test_remove_entry()
 {
-  int result = 3;
+  elem_t result = int_elem(3);
   char *key = "abc";
-  int value = 123;
+  elem_t value = int_elem(123);
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
   ioopm_hash_table_insert(ht, key, value);
   ioopm_hash_table_remove(ht, key);
@@ -78,10 +83,10 @@ void test_remove_entry()
 
 void test_remove_noexist_entry()
 {
-  int result = 3;
+  elem_t result = int_elem(3);
   char *key = "abc";
   char *key_noexist = "bcc";
-  int value = 123;
+  elem_t value = int_elem(123);
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
   ioopm_hash_table_insert(ht, key, value);
   CU_ASSERT_FALSE(ioopm_hash_table_remove(ht, key_noexist));
@@ -117,7 +122,7 @@ void test_has_key_single()
 
   char *k = "abc";
   char *k2 = "xyz";
-  int value = 123;
+  elem_t value = int_elem(123);
 
   ioopm_hash_table_insert(ht, k, value);
 
@@ -141,9 +146,9 @@ void test_has_key_multiple()
   char *k3 = "ghi";
   char *k4 = "jkl";
 
-  ioopm_hash_table_insert(ht, k1, 1);
-  ioopm_hash_table_insert(ht, k2, 2);
-  ioopm_hash_table_insert(ht, k3, 3);
+  ioopm_hash_table_insert(ht, k1, int_elem(1));
+  ioopm_hash_table_insert(ht, k2, int_elem(2));
+  ioopm_hash_table_insert(ht, k3, int_elem(3));
 
   CU_ASSERT_TRUE(ioopm_hash_table_has_key(ht, k1));
   CU_ASSERT_TRUE(ioopm_hash_table_has_key(ht, k2));
@@ -162,7 +167,7 @@ void test_has_key_insert_remove()
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
 
   char *k = "abc";
-  int value = 123;
+  elem_t value = int_elem(123);
 
   ioopm_hash_table_insert(ht, k, value);
   ioopm_hash_table_remove(ht, k);
@@ -185,9 +190,9 @@ void test_has_key_remove_one_of_many()
   char *k2 = "def";
   char *k3 = "ghi";
 
-  ioopm_hash_table_insert(ht, k1, 1);
-  ioopm_hash_table_insert(ht, k2, 2);
-  ioopm_hash_table_insert(ht, k3, 3);
+  ioopm_hash_table_insert(ht, k1, int_elem(1));
+  ioopm_hash_table_insert(ht, k2, int_elem(2));
+  ioopm_hash_table_insert(ht, k3, int_elem(3));
 
   ioopm_hash_table_remove(ht, k2);
 
@@ -214,14 +219,14 @@ void test_iterate_over_empty_hash()
 void test_iterate_hash_once()
 {
   char *k = "abc";
-  int value = 123;
+  elem_t value = int_elem(123);
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
   ioopm_hash_table_insert(ht, k, value);
   ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht);
-  int current_value = ioopm_hash_table_iterator_current_value(it);
+  elem_t current_value = int_elem(ioopm_hash_table_iterator_current_value(it));
   ioopm_hash_table_iterator_destroy(it);
   ioopm_hash_table_destroy(ht);
-  CU_ASSERT_EQUAL(current_value, 123);
+  CU_ASSERT_EQUAL(current_value.i, 123);
 }
 
 
@@ -233,7 +238,7 @@ void test_iterator_several_entries()
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
   for (int i = 0; i != 3; ++i)
   {
-    ioopm_hash_table_insert(ht, keys[i], values[i]);
+    ioopm_hash_table_insert(ht, keys[i], int_elem(values[i]));
   }
 
   int iteration_count = 0;
@@ -259,7 +264,7 @@ void test_iterator_entries_visited_once()
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
   for (int i = 0; i != 3; ++i)
   {
-    ioopm_hash_table_insert(ht, keys[i], values[i]);
+    ioopm_hash_table_insert(ht, keys[i], int_elem(values[i]));
   }
 
   int iteration_count = 0;
@@ -311,7 +316,7 @@ void test_entries_in_same_bucket()
   int iteration_count = 0;
   for (int i = 0; i != 3; ++i)
   {
-    ioopm_hash_table_insert(ht, keys[i], values[i]);
+    ioopm_hash_table_insert(ht, keys[i], int_elem(values[i]));
   }
 
   ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht);

@@ -14,7 +14,7 @@ struct list
 {
     link_t *first;
     link_t *last;
-    int size;
+    size_t size;
 };
 
 typedef struct list ioopm_list_t;
@@ -93,14 +93,14 @@ int ioopm_list_last(ioopm_list_t *list)
     return list->last->previous->value;
 }
 
-void ioopm_list_insert(ioopm_list_t *list, int index, int value)
+void ioopm_list_insert(ioopm_list_t *list, size_t index, int value)
 {
     
     if(index <= list->size)
     {
         link_t *first_link = list->first->next;
 
-        for(int i = 0; i < index; i++)
+        for(size_t i = 0; i < index; i++)
         {
             first_link = first_link->next;
         }
@@ -113,10 +113,10 @@ void ioopm_list_insert(ioopm_list_t *list, int index, int value)
 
 
 
-int ioopm_list_remove(ioopm_list_t *list, int index)
+int ioopm_list_remove(ioopm_list_t *list, size_t index)
 {
     link_t *first_link = list->first->next;
-    int i = 0;
+    size_t i = 0;
 
     while(first_link != list->last)
     {
@@ -139,12 +139,12 @@ int ioopm_list_remove(ioopm_list_t *list, int index)
     return 0;
 }
 
-int ioopm_list_get(ioopm_list_t *list, int index)
+int ioopm_list_get(ioopm_list_t *list, size_t index)
 {
     link_t *first_link = list->first->next;
 
 
-    int i = 0;
+    size_t i = 0;
     while(first_link != list->last)
     {
         if(i == index)
@@ -158,7 +158,7 @@ int ioopm_list_get(ioopm_list_t *list, int index)
     return 0;
 }
 
-int ioopm_list_size(ioopm_list_t *list)
+size_t ioopm_list_size(ioopm_list_t *list)
 {
     return list->size;
 }

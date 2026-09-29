@@ -6,6 +6,11 @@
 #include <stdbool.h>
 #include <string.h>
 #define No_Buckets 17
+#define int_elem(x)   ((elem_t) { .i = (x) })
+#define bool_elem(x)  ((elem_t) { .b = (x) })
+#define ptr_elem(x)   ((elem_t) { .p = (x) })
+#define string_elem(x) ((elem_t) { .s = (x) })
+
 
 typedef struct entry entry_t;
 
@@ -20,7 +25,18 @@ struct hash_table
 {
   // NOTE: addressing this dodge is optional.
   entry_t buckets[No_Buckets];
+  ioopm_hash_function *hash_fn;
+  ioopm_eq_function *key_eq_fn;
 };
+
+bool eq_function(elem_t a, elem_t b)
+{
+	if(a.i != NULL)
+	{
+		return a.i == b.i;
+	}
+}
+
 
 struct hash_table_iterator
 {
@@ -28,6 +44,13 @@ struct hash_table_iterator
   size_t current_bucket;
   entry_t *current_entry;
 };
+
+bool ioopm_eq_function(elem_t a, elem_t b)
+{
+
+}
+
+size_t ioopm_hash_function(elem_t key)
 
 static size_t string_knr_hash(const char *str)
 {

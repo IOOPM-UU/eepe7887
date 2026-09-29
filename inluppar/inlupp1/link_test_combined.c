@@ -4,6 +4,10 @@
 #include "utils.h"
 #include "linked_list.h"
 #include "list_iterator.h"
+#define int_elem(x)   ((elem_t) { .i = (x) })
+#define bool_elem(x)  ((elem_t) { .b = (x) })
+#define ptr_elem(x)   ((elem_t) { .p = (x) })
+#define string_elem(x) ((elem_t) { .s = (x) })
 
 
 void test_create_empty_it()
@@ -20,29 +24,29 @@ void test_create_empty_it()
 
 void test_iter_on_list()
 {
-    int value = 12;
+    elem_t value = int_elem(12);
     ioopm_list_t *list = ioopm_list_create();
     ioopm_list_iterator_t *iter = ioopm_list_iterator_create(list);
     ioopm_list_iterator_insert(iter, value);
-    int current_value = ioopm_list_iterator_current(iter);
-    CU_ASSERT_EQUAL(current_value, value);
+    elem_t current_value = ioopm_list_iterator_current(iter);
+    CU_ASSERT_EQUAL(current_value.i, value.i);
     ioopm_list_iterator_destroy(iter);
     ioopm_list_destroy(list);
 }
 
 void test_iter_advance()
 {
-    int value_1 = 12;
-    int value_2 = 26;
+    elem_t value_1 = int_elem(12);
+    elem_t value_2 = int_elem(26);
     ioopm_list_t *list = ioopm_list_create();
     ioopm_list_iterator_t *iter = ioopm_list_iterator_create(list);
     ioopm_list_iterator_insert(iter, value_1);
     ioopm_list_iterator_insert(iter, value_2);
-    int first_value = ioopm_list_iterator_current(iter);
+    elem_t first_value = ioopm_list_iterator_current(iter);
     ioopm_list_iterator_advance(iter);
-    int second_value = ioopm_list_iterator_current(iter);
-    CU_ASSERT_EQUAL(first_value, value_1);
-    CU_ASSERT_EQUAL(second_value, value_2);
+    elem_t second_value = ioopm_list_iterator_current(iter);
+    CU_ASSERT_EQUAL(first_value.i, value_1.i);
+    CU_ASSERT_EQUAL(second_value.i, value_2.i);
     ioopm_list_iterator_destroy(iter);
     ioopm_list_destroy(list);    
 
@@ -52,24 +56,24 @@ void test_iter_advance()
 
 void test_iter_remove_and_insert()
 {
-    int value_1 = 12;
-    int value_2 = 26;
-    int value_3 = 2;
-    int value_4 = 444;
+    elem_t value_1 = int_elem(12);
+    elem_t value_2 = int_elem(26);
+    elem_t value_3 = int_elem(2);
+    elem_t value_4 = int_elem(444);
     ioopm_list_t *list = ioopm_list_create();
     ioopm_list_iterator_t *iter = ioopm_list_iterator_create(list);
     ioopm_list_iterator_insert(iter, value_1);
     ioopm_list_iterator_insert(iter, value_2);
-    int current_value = ioopm_list_iterator_current(iter);
-    CU_ASSERT_EQUAL(current_value, value_1);
+    elem_t current_value = ioopm_list_iterator_current(iter);
+    CU_ASSERT_EQUAL(current_value.i, value_1.i);
     ioopm_list_iterator_remove(iter);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(iter), value_2);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(iter).i, value_2.i);
     ioopm_list_iterator_insert(iter, value_3);
     ioopm_list_iterator_insert(iter, value_4);
     ioopm_list_iterator_advance(iter);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(iter), value_4);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(iter).i, value_4.i);
     ioopm_list_iterator_advance(iter);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(iter), value_3);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(iter).i, value_3.i);
     ioopm_list_iterator_destroy(iter);
     ioopm_list_destroy(list);    
 
@@ -84,22 +88,20 @@ void test_create_empty_list()
 }
 void test_append_list_once()
 {
-    int value = 12;
+    elem_t value = int_elem(12);
     ioopm_list_t *list = ioopm_list_create();
     ioopm_list_append(list, value);
-    int head =ioopm_list_head(list);
-    int tail = ioopm_list_last(list);
+    elem_t head =ioopm_list_head(list);
+    elem_t tail = ioopm_list_last(list);
     ioopm_list_destroy(list);
-    CU_ASSERT_EQUAL(head, value);
-    CU_ASSERT_EQUAL(tail, value);
+    CU_ASSERT_EQUAL(head.i, value.i);
+    CU_ASSERT_EQUAL(tail.i, value.i);
 }
-
 void test_several_appends()
 {
-
-    int value1 = 12;
-    int value2 = 13;
-    int value3 = 11;
+    elem_t value1 = int_elem(12);
+    elem_t value2 = int_elem(13);
+    elem_t value3 = int_elem(11);
 
     ioopm_list_t *list = ioopm_list_create();
 
@@ -107,24 +109,26 @@ void test_several_appends()
     ioopm_list_append(list, value2);
     ioopm_list_append(list, value3);
 
-    int head =ioopm_list_get(list, 0);
-    int middle = ioopm_list_get(list, 1);
-    int tail = ioopm_list_get(list, 2);
-    
+    size_t first_pos = 0;
+    size_t middle_pos = 1;
+    size_t last_pos = 2;
 
-    ioopm_list_destroy(list);   
+    elem_t head = ioopm_list_get(list, first_pos);
+    elem_t middle = ioopm_list_get(list, middle_pos);
+    elem_t tail = ioopm_list_get(list, last_pos);
 
-    CU_ASSERT_EQUAL(head, value1);
-    CU_ASSERT_EQUAL(middle, value2);
-    CU_ASSERT_EQUAL(tail, value3);
+    ioopm_list_destroy(list);
 
+    CU_ASSERT_EQUAL(head.i, value1.i);
+    CU_ASSERT_EQUAL(middle.i, value2.i);
+    CU_ASSERT_EQUAL(tail.i, value3.i);
 }
 
 void test_several_prepends()
 {
-      int value1 = 12;
-    int value2 = 13;
-    int value3 = 11;
+    elem_t value1 = int_elem(12);
+    elem_t value2 = int_elem(13);
+    elem_t value3 = int_elem(11);
 
     ioopm_list_t *list = ioopm_list_create();
 
@@ -132,52 +136,57 @@ void test_several_prepends()
     ioopm_list_prepend(list, value2);
     ioopm_list_prepend(list, value3);
 
-    int head =ioopm_list_head(list);
-    int middle = ioopm_list_get(list, 1);
-    int tail = ioopm_list_last(list);
-    
-    ioopm_list_destroy(list);   
+    size_t middle_pos = 1;
 
-    CU_ASSERT_EQUAL(tail, value1);
-    CU_ASSERT_EQUAL(middle, value2);
-    CU_ASSERT_EQUAL(head, value3);
+    elem_t head = ioopm_list_head(list);
+    elem_t middle = ioopm_list_get(list, middle_pos);
+    elem_t tail = ioopm_list_last(list);
+
+    ioopm_list_destroy(list);
+
+    CU_ASSERT_EQUAL(tail.i, value1.i);
+    CU_ASSERT_EQUAL(middle.i, value2.i);
+    CU_ASSERT_EQUAL(head.i, value3.i);
 }
 
 void test_append_prepend_insert()
 {
-    int value1 = 12; // appendas sist
-    int value2 = 13; // prependas först
-    int value3 = 7;  // insertas i mitten
+    elem_t value1 = int_elem(12); // appendas sist
+    elem_t value2 = int_elem(13); // prependas först
+    elem_t value3 = int_elem(7);  // insertas i mitten
 
     ioopm_list_t *list = ioopm_list_create();
 
-    ioopm_list_append(list, value1);   // list: [12]
-    ioopm_list_prepend(list, value2);  // list: [13, 12]
-    ioopm_list_insert(list, 1, value3); // list: [13, 7, 12]
+    size_t first_pos = 0;
+    size_t middle_pos = 1;
+    size_t last_pos = 2;
 
-    int first = ioopm_list_get(list, 0);
-    int middle = ioopm_list_get(list, 1);
-    int last = ioopm_list_get(list, 2);
+    ioopm_list_append(list, value1);                // list: [12]
+    ioopm_list_prepend(list, value2);               // list: [13, 12]
+    ioopm_list_insert(list, middle_pos, value3);    // list: [13, 7, 12]
 
-    int head = ioopm_list_head(list);
-    int tail = ioopm_list_last(list);
+    elem_t first = ioopm_list_get(list, first_pos);
+    elem_t middle = ioopm_list_get(list, middle_pos);
+    elem_t last = ioopm_list_get(list, last_pos);
+
+    elem_t head = ioopm_list_head(list);
+    elem_t tail = ioopm_list_last(list);
 
     ioopm_list_destroy(list);
 
-    CU_ASSERT_EQUAL(first, value2);
-    CU_ASSERT_EQUAL(middle, value3);
-    CU_ASSERT_EQUAL(last, value1);
+    CU_ASSERT_EQUAL(first.i, value2.i);
+    CU_ASSERT_EQUAL(middle.i, value3.i);
+    CU_ASSERT_EQUAL(last.i, value1.i);
 
-    CU_ASSERT_EQUAL(head, value2);
-    CU_ASSERT_EQUAL(tail, value1);
+    CU_ASSERT_EQUAL(head.i, value2.i);
+    CU_ASSERT_EQUAL(tail.i, value1.i);
 }
-
 
 void test_remove_from_list()
 {
-    int value1 = 12;
-    int value2 = 13;
-    int value3 = 11;
+    elem_t value1 = int_elem(12);
+    elem_t value2 = int_elem(13);
+    elem_t value3 = int_elem(11);
 
     ioopm_list_t *list = ioopm_list_create();
 
@@ -186,26 +195,27 @@ void test_remove_from_list()
     ioopm_list_append(list, value3);
     // list: [12, 13, 11]
 
-    int removed = ioopm_list_remove(list, 1); // ta bort mittenelementet
+    size_t middle_pos = 1;
+    elem_t removed = ioopm_list_remove(list, middle_pos); // ta bort mittenelementet
     // list: [12, 11]
 
-    int head = ioopm_list_head(list);
-    int tail = ioopm_list_last(list);
-    int size = ioopm_list_size(list);
+    elem_t head = ioopm_list_head(list);
+    elem_t tail = ioopm_list_last(list);
+    size_t size = ioopm_list_size(list);
 
     ioopm_list_destroy(list);
 
-    CU_ASSERT_EQUAL(removed, value2);
-    CU_ASSERT_EQUAL(head, value1);
-    CU_ASSERT_EQUAL(tail, value3);
+    CU_ASSERT_EQUAL(removed.i, value2.i);
+    CU_ASSERT_EQUAL(head.i, value1.i);
+    CU_ASSERT_EQUAL(tail.i, value3.i);
     CU_ASSERT_EQUAL(size, 2);
 }
 
 void test_remove_first_and_last()
 {
-    int value1 = 1;
-    int value2 = 2;
-    int value3 = 3;
+    elem_t value1 = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value3 = int_elem(3);
 
     ioopm_list_t *list = ioopm_list_create();
 
@@ -214,22 +224,224 @@ void test_remove_first_and_last()
     ioopm_list_append(list, value3);
     // list: [1, 2, 3]
 
-    int removed_first = ioopm_list_remove(list, 0);
+    size_t first_pos = 0;
+    elem_t removed_first = ioopm_list_remove(list, first_pos);
     // list: [2, 3]
-    int removed_last = ioopm_list_remove(list, ioopm_list_size(list) - 1);
+
+    size_t last_pos = ioopm_list_size(list) - 1;
+    elem_t removed_last = ioopm_list_remove(list, last_pos);
     // list: [2]
 
-    int only_element = ioopm_list_head(list);
-    int size = ioopm_list_size(list);
+    elem_t only_element = ioopm_list_head(list);
+    size_t size = ioopm_list_size(list);
 
     ioopm_list_destroy(list);
 
-    CU_ASSERT_EQUAL(removed_first, value1);
-    CU_ASSERT_EQUAL(removed_last, value3);
-    CU_ASSERT_EQUAL(only_element, value2);
+    CU_ASSERT_EQUAL(removed_first.i, value1.i);
+    CU_ASSERT_EQUAL(removed_last.i, value3.i);
+    CU_ASSERT_EQUAL(only_element.i, value2.i);
     CU_ASSERT_EQUAL(size, 1);
 }
 
+void test_several_appends_string()
+{
+    elem_t value1 = string_elem("apple");
+    elem_t value2 = string_elem("banana");
+    elem_t value3 = string_elem("cherry");
+
+    ioopm_list_t *list = ioopm_list_create();
+
+    ioopm_list_append(list, value1);
+    ioopm_list_append(list, value2);
+    ioopm_list_append(list, value3);
+
+    size_t first_pos = 0;
+    size_t middle_pos = 1;
+    size_t last_pos = 2;
+
+    elem_t head = ioopm_list_get(list, first_pos);
+    elem_t middle = ioopm_list_get(list, middle_pos);
+    elem_t tail = ioopm_list_get(list, last_pos);
+
+    ioopm_list_destroy(list);
+
+    CU_ASSERT_STRING_EQUAL(head.s, value1.s);
+    CU_ASSERT_STRING_EQUAL(middle.s, value2.s);
+    CU_ASSERT_STRING_EQUAL(tail.s, value3.s);
+}
+
+void test_several_prepends_string()
+{
+    elem_t value1 = string_elem("apple");
+    elem_t value2 = string_elem("banana");
+    elem_t value3 = string_elem("cherry");
+
+    ioopm_list_t *list = ioopm_list_create();
+
+    ioopm_list_prepend(list, value1);
+    ioopm_list_prepend(list, value2);
+    ioopm_list_prepend(list, value3);
+    // list: ["cherry", "banana", "apple"]
+
+    size_t middle_pos = 1;
+
+    elem_t head = ioopm_list_head(list);
+    elem_t middle = ioopm_list_get(list, middle_pos);
+    elem_t tail = ioopm_list_last(list);
+
+    ioopm_list_destroy(list);
+
+    CU_ASSERT_STRING_EQUAL(tail.s, value1.s);
+    CU_ASSERT_STRING_EQUAL(middle.s, value2.s);
+    CU_ASSERT_STRING_EQUAL(head.s, value3.s);
+}
+
+void test_append_prepend_insert_string()
+{
+    elem_t value1 = string_elem("last");    // appendas sist
+    elem_t value2 = string_elem("first");   // prependas först
+    elem_t value3 = string_elem("middle");  // insertas i mitten
+
+    ioopm_list_t *list = ioopm_list_create();
+
+    size_t first_pos = 0;
+    size_t middle_pos = 1;
+    size_t last_pos = 2;
+
+    ioopm_list_append(list, value1);             // ["last"]
+    ioopm_list_prepend(list, value2);            // ["first", "last"]
+    ioopm_list_insert(list, middle_pos, value3); // ["first", "middle", "last"]
+
+    elem_t first = ioopm_list_get(list, first_pos);
+    elem_t middle = ioopm_list_get(list, middle_pos);
+    elem_t last = ioopm_list_get(list, last_pos);
+
+    elem_t head = ioopm_list_head(list);
+    elem_t tail = ioopm_list_last(list);
+
+    ioopm_list_destroy(list);
+
+    CU_ASSERT_STRING_EQUAL(first.s, value2.s);
+    CU_ASSERT_STRING_EQUAL(middle.s, value3.s);
+    CU_ASSERT_STRING_EQUAL(last.s, value1.s);
+
+    CU_ASSERT_STRING_EQUAL(head.s, value2.s);
+    CU_ASSERT_STRING_EQUAL(tail.s, value1.s);
+}
+
+void test_remove_from_list_string()
+{
+    elem_t value1 = string_elem("apple");
+    elem_t value2 = string_elem("banana");
+    elem_t value3 = string_elem("cherry");
+
+    ioopm_list_t *list = ioopm_list_create();
+
+    ioopm_list_append(list, value1);
+    ioopm_list_append(list, value2);
+    ioopm_list_append(list, value3);
+    // list: ["apple", "banana", "cherry"]
+
+    size_t middle_pos = 1;
+    elem_t removed = ioopm_list_remove(list, middle_pos);
+    // list: ["apple", "cherry"]
+
+    elem_t head = ioopm_list_head(list);
+    elem_t tail = ioopm_list_last(list);
+    size_t size = ioopm_list_size(list);
+
+    ioopm_list_destroy(list);
+
+    CU_ASSERT_STRING_EQUAL(removed.s, value2.s);
+    CU_ASSERT_STRING_EQUAL(head.s, value1.s);
+    CU_ASSERT_STRING_EQUAL(tail.s, value3.s);
+    CU_ASSERT_EQUAL(size, 2);
+}
+
+void test_remove_first_and_last_string()
+{
+    elem_t value1 = string_elem("one");
+    elem_t value2 = string_elem("two");
+    elem_t value3 = string_elem("three");
+
+    ioopm_list_t *list = ioopm_list_create();
+
+    ioopm_list_append(list, value1);
+    ioopm_list_append(list, value2);
+    ioopm_list_append(list, value3);
+    // list: ["one", "two", "three"]
+
+    size_t first_pos = 0;
+    elem_t removed_first = ioopm_list_remove(list, first_pos);
+    // list: ["two", "three"]
+
+    size_t last_pos = ioopm_list_size(list) - 1;
+    elem_t removed_last = ioopm_list_remove(list, last_pos);
+    // list: ["two"]
+
+    elem_t only_element = ioopm_list_head(list);
+    size_t size = ioopm_list_size(list);
+
+    ioopm_list_destroy(list);
+
+    CU_ASSERT_STRING_EQUAL(removed_first.s, value1.s);
+    CU_ASSERT_STRING_EQUAL(removed_last.s, value3.s);
+    CU_ASSERT_STRING_EQUAL(only_element.s, value2.s);
+    CU_ASSERT_EQUAL(size, 1);
+}
+
+void test_iter_on_list_string()
+{
+    elem_t value = string_elem("hello");
+    ioopm_list_t *list = ioopm_list_create();
+    ioopm_list_iterator_t *iter = ioopm_list_iterator_create(list);
+    ioopm_list_iterator_insert(iter, value);
+    elem_t current_value = ioopm_list_iterator_current(iter);
+    CU_ASSERT_STRING_EQUAL(current_value.s, value.s);
+    ioopm_list_iterator_destroy(iter);
+    ioopm_list_destroy(list);
+}
+
+void test_iter_advance_string()
+{
+    elem_t value_1 = string_elem("hello");
+    elem_t value_2 = string_elem("world");
+    ioopm_list_t *list = ioopm_list_create();
+    ioopm_list_iterator_t *iter = ioopm_list_iterator_create(list);
+    ioopm_list_iterator_insert(iter, value_1);
+    ioopm_list_iterator_insert(iter, value_2);
+    elem_t first_value = ioopm_list_iterator_current(iter);
+    ioopm_list_iterator_advance(iter);
+    elem_t second_value = ioopm_list_iterator_current(iter);
+    CU_ASSERT_STRING_EQUAL(first_value.s, value_1.s);
+    CU_ASSERT_STRING_EQUAL(second_value.s, value_2.s);
+    ioopm_list_iterator_destroy(iter);
+    ioopm_list_destroy(list);
+}
+
+void test_iter_remove_and_insert_string()
+{
+    elem_t value_1 = string_elem("alpha");
+    elem_t value_2 = string_elem("beta");
+    elem_t value_3 = string_elem("gamma");
+    elem_t value_4 = string_elem("delta");
+    ioopm_list_t *list = ioopm_list_create();
+    ioopm_list_iterator_t *iter = ioopm_list_iterator_create(list);
+    ioopm_list_iterator_insert(iter, value_1);
+    ioopm_list_iterator_insert(iter, value_2);
+    elem_t current_value = ioopm_list_iterator_current(iter);
+    CU_ASSERT_STRING_EQUAL(current_value.s, value_1.s);
+    ioopm_list_iterator_remove(iter);
+    CU_ASSERT_STRING_EQUAL(ioopm_list_iterator_current(iter).s, value_2.s);
+    ioopm_list_iterator_insert(iter, value_3);
+    ioopm_list_iterator_insert(iter, value_4);
+    ioopm_list_iterator_advance(iter);
+    CU_ASSERT_STRING_EQUAL(ioopm_list_iterator_current(iter).s, value_4.s);
+    ioopm_list_iterator_advance(iter);
+    CU_ASSERT_STRING_EQUAL(ioopm_list_iterator_current(iter).s, value_3.s);
+    ioopm_list_iterator_destroy(iter);
+    ioopm_list_destroy(list);
+}
 
 int main() {
   // First we try to set up CUnit, and exit if we fail
@@ -261,7 +473,15 @@ int main() {
     CU_add_test(my_test_suite, "Test iter on empty list", test_create_empty_it) == NULL ||
     CU_add_test(my_test_suite, "Test iter on list", test_iter_on_list) == NULL ||
     CU_add_test(my_test_suite, "Test iter advance", test_iter_advance) == NULL ||
-    CU_add_test(my_test_suite, "Test iter remove and insert", test_iter_remove_and_insert) == NULL)
+    CU_add_test(my_test_suite, "Test iter remove and insert", test_iter_remove_and_insert) == NULL ||
+        CU_add_test(my_test_suite, "TEST several appends (string)", test_several_appends_string) == NULL ||
+    CU_add_test(my_test_suite, "TEST several prepends (string)", test_several_prepends_string) == NULL ||
+    CU_add_test(my_test_suite, "TEST append, prepend and insert (string)", test_append_prepend_insert_string) == NULL ||
+    CU_add_test(my_test_suite, "TEST remove from middle (string)", test_remove_from_list_string) == NULL ||
+    CU_add_test(my_test_suite, "TEST remove first and last (string)", test_remove_first_and_last_string) == NULL ||
+    CU_add_test(my_test_suite, "Test iter on list (string)", test_iter_on_list_string) == NULL ||
+    CU_add_test(my_test_suite, "Test iter advance (string)", test_iter_advance_string) == NULL ||
+    CU_add_test(my_test_suite, "Test iter remove and insert (string)", test_iter_remove_and_insert_string) == NULL)
     
   )
   )

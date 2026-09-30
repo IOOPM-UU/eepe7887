@@ -31,7 +31,6 @@ struct hash_table_iterator
 };
 
 
-
 struct hash_table
 {
   	// NOTE: addressing this dodge is optional.
@@ -58,6 +57,7 @@ ioopm_hash_table_t *ioopm_hash_table_create(ioopm_hash_function *hash_fn, ioopm_
   	ht->key_eq_fn = key_eq_fn;
   	return ht;
 }
+
 static entry_t *entry_destroy(entry_t *entry)
 {
   	entry_t *next = entry->next;
@@ -183,7 +183,7 @@ size_t ioopm_hash_table_size(const ioopm_hash_table_t *ht)
 /**
 * @file hash_table_iterator.h
 * @author Alex Egeberg, Eemeli Peura
-* @date 1 Sep 2022
+* @date Sep 2026
 * @brief Simple hash table iterator
 *
 * Hash table iterators provide an interface to iterate through all entries in a hash table.

@@ -33,18 +33,23 @@ static size_t string_hash(elem_t key)
 
 void process_word(elem_t *word, ioopm_hash_table_t *ht)
 {
-int my_int = 0;
-elem_t my_elem = int_elem(my_int);
+
+elem_t my_elem;
 // FIXME: Rewrite to match your own interface, error-handling, etc.
-int freq =
-ioopm_hash_table_has_key(ht, word)?
-ioopm_hash_table_lookup(ht, word, &my_elem):
-0;
-ioopm_hash_table_insert(ht, word, int_elem(freq + 1));
+bool exists = ioopm_hash_table_lookup(ht, word, &my_elem);
+
+   if (exists) {
+       ioopm_hash_table_insert(ht, word, int_elem(my_elem.i + 1)); // behåll gamla nyckeln
+   } else {
+       elem_t key = string_elem(strdup(word->s));
+       ioopm_hash_table_insert(ht, &key, int_elem(1));
+   }
 }
 /// @brief Process a single file, updating the frequencies of its words
 /// @param filename the name of the file to process
 /// @param ht a hash table containing the frequencies of the words found so far
+
+
 void process_file(char *filename, ioopm_hash_table_t *ht)
 {
 FILE *f = fopen(filename, "r");
@@ -126,6 +131,7 @@ while (i < size) {
     ioopm_hash_table_iterator_advance(it);
 
 }
+
 // FIXME: Iterate over hash table to dump its words and
 // frequencies into the array above
 sort_freq_words(freq_words, size);
@@ -136,5 +142,14 @@ printf("%s: %d\n", freq_words[i].word->s, freq_words[i].freq.i);
 printf("SIZE: %d", size);
 // FIXME: Leaks memory! Use valgrind to find out where that memory is
 // being allocated, and then insert code here to free it.
+
+elem_t k = string_elem("test"), v;
+ioopm_hash_table_insert(ht, &k, int_elem(1));
+ioopm_hash_table_lookup(ht, &k, &v);   printf("%d\n", v.i); // vill ha 1
+ioopm_hash_table_insert(ht, &k, int_elem(2));
+ioopm_hash_table_lookup(ht, &k, &v);   printf("%d\n", v.i); // vill ha 2
+ioopm_hash_table_insert(ht, &k, int_elem(3));
+ioopm_hash_table_lookup(ht, &k, &v);   printf("%d\n", v.i); // vill ha 3
 ioopm_hash_table_destroy(ht);
+
 }

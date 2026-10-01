@@ -354,6 +354,38 @@ void test_entries_in_same_bucket()
   CU_ASSERT_EQUAL(iteration_count, 3);
 }
 
+static size_t int_hash(elem_t key)
+{
+  return (size_t) key.i;
+}
+
+static bool int_eq(elem_t a, elem_t b)
+{
+  return a.i == b.i;
+}
+
+void test_int_keys()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(int_hash, int_eq);
+
+  elem_t k1 = int_elem(5);
+  elem_t k2 = int_elem(22);   // 22 % 17 == 5, so it collides with k1
+  elem_t k3 = int_elem(7);
+  elem_t result = int_elem(0);
+
+  ioopm_hash_table_insert(ht, &k1, int_elem(100));
+  ioopm_hash_table_insert(ht, &k2, int_elem(200));
+
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, &k1, &result));
+  CU_ASSERT_EQUAL(result.i, 100);
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, &k2, &result));
+  CU_ASSERT_EQUAL(result.i, 200);
+  CU_ASSERT_FALSE(ioopm_hash_table_has_key(ht, &k3));
+  CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), 2);
+
+  ioopm_hash_table_destroy(ht);
+}
+
 int main()
 {
   if (CU_initialize_registry() != CUE_SUCCESS)
@@ -382,7 +414,8 @@ int main()
     (CU_add_test(my_test_suite, "Test visit once", test_iterator_entries_visited_once) == NULL) ||
     (CU_add_test(my_test_suite, "Test entries in same bucket", test_entries_in_same_bucket) == NULL) ||
     (CU_add_test(my_test_suite, "Test remove no exist", test_remove_noexist_entry) == NULL) ||
-    (CU_add_test(my_test_suite, "Test insert inuse", test_insert_inuse) == NULL)
+    (CU_add_test(my_test_suite, "Test insert inuse", test_insert_inuse) == NULL ||
+    CU_add_test(my_test_suite, "Test int keys", test_int_keys) == NULL)
   )
   {
     CU_cleanup_registry();

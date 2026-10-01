@@ -143,13 +143,6 @@ printf("SIZE: %d", size);
 // FIXME: Leaks memory! Use valgrind to find out where that memory is
 // being allocated, and then insert code here to free it.
 
-elem_t k = string_elem("test"), v;
-ioopm_hash_table_insert(ht, &k, int_elem(1));
-ioopm_hash_table_lookup(ht, &k, &v);   printf("%d\n", v.i); // vill ha 1
-ioopm_hash_table_insert(ht, &k, int_elem(2));
-ioopm_hash_table_lookup(ht, &k, &v);   printf("%d\n", v.i); // vill ha 2
-ioopm_hash_table_insert(ht, &k, int_elem(3));
-ioopm_hash_table_lookup(ht, &k, &v);   printf("%d\n", v.i); // vill ha 3
 ioopm_hash_table_destroy(ht);
 
 }

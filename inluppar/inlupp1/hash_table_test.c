@@ -10,7 +10,6 @@
 #define ptr_elem(x)   ((elem_t) { .p = (x) })
 #define string_elem(x) ((elem_t) { .s = (x) })
 
-// Hash and equality functions for string keys
 static size_t string_hash(elem_t key)
 {
   size_t result = 0;
@@ -47,12 +46,10 @@ void test_insert_once()
   elem_t key = string_elem("abc");
   elem_t value = int_elem(123);
 
-  // check that key is not in ht
   elem_t result = int_elem(0);
   CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, &key, &result));
   CU_ASSERT_EQUAL(result.i, 0);
 
-  // insert key-value pair and check that the mapping exists
   ioopm_hash_table_insert(ht, &key, value);
   CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, &key, &result));
   CU_ASSERT_EQUAL(result.i, value.i);
@@ -309,7 +306,7 @@ void test_iterator_entries_visited_once()
 
 void test_entries_in_same_bucket()
 {
-  // "a", "r" and "ac" all hash to bucket 12 with a mod-17 string hash
+
   elem_t keys[3] = {string_elem("a"), string_elem("r"), string_elem("ac")};
   int values[3] = {0, 1, 2};
   int count_1 = 0;
@@ -369,7 +366,7 @@ void test_int_keys()
   ioopm_hash_table_t *ht = ioopm_hash_table_create(int_hash, int_eq);
 
   elem_t k1 = int_elem(5);
-  elem_t k2 = int_elem(22);   // 22 % 17 == 5, so it collides with k1
+  elem_t k2 = int_elem(22);   
   elem_t k3 = int_elem(7);
   elem_t result = int_elem(0);
 

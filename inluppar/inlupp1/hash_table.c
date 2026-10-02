@@ -40,7 +40,6 @@ struct hash_table
 };
 
 
-
 static entry_t *entry_create(const elem_t *key, elem_t value, entry_t *next)
 {
   	entry_t *entry = calloc(1, sizeof(entry_t));
@@ -50,6 +49,10 @@ static entry_t *entry_create(const elem_t *key, elem_t value, entry_t *next)
   	return entry;
 }
 
+/// @brief Creates a hashtable
+/// @param hash_fn hashing function used to hash all of the keys
+/// @param key_eq_fn equality function to check equality between keys
+/// @return hashtable
 ioopm_hash_table_t *ioopm_hash_table_create(ioopm_hash_function *hash_fn, ioopm_eq_function *key_eq_fn)
 {
   	ioopm_hash_table_t *ht = calloc(1, sizeof(ioopm_hash_table_t));
@@ -66,6 +69,8 @@ static entry_t *entry_destroy(entry_t *entry)
   	return entry;
 }
 
+/// @brief destroys the hashtable
+/// @param ht the hashtable to be destroyed
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht)
 {
  	for (size_t i = 0; i < No_Buckets; i++)
@@ -93,6 +98,10 @@ static entry_t *find_previous_entry(ioopm_hash_table_t *ht, const elem_t *key)
     return previous;
 }
 
+/// @brief inserts a key and a value into a hashatable
+/// @param ht the hashtable
+/// @param key the key to insert
+/// @param value the value to insert
 void ioopm_hash_table_insert(ioopm_hash_table_t *ht, const elem_t *key, elem_t value)
 {
   	entry_t *previous = find_previous_entry(ht, key);
@@ -107,6 +116,11 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, const elem_t *key, elem_t v
     }
 }
 
+/// @brief looks inside the hashtable to see if a key exists
+/// @param ht the hashtable
+/// @param key the key to look for
+/// @param result saves the value
+/// @return true or false depending on the outcome
 bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, const elem_t *key, elem_t *result)
 {
 	entry_t *previous = find_previous_entry(ht, key);
@@ -122,6 +136,10 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, const elem_t *key, elem_t *
   	}
 }
 
+/// @brief removes entry from hashtable
+/// @param ht the hashtable
+/// @param key the key to be removed
+/// @return true or false depending on the outcome
 bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, const elem_t *key)
 {
   	elem_t result;
@@ -139,14 +157,19 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, const elem_t *key)
     }
 }
 
-// TODO: documentation
+/// @brief looks inside the hashtable to see if the key exists
+/// @param ht the hashtable
+/// @param key the key (OSÄKER PÅ HUR JAG SKA SKRIVA DETTA)
+/// @return true or false depending on the outcome
 bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, const elem_t *key)
 {
   	elem_t result;
    	return ioopm_hash_table_lookup(ht, key, &result);
 }
 
-// TODO: documentation
+/// @brief looks if the hashtable is empty or not
+/// @param ht the hashtable
+/// @return true or false depending on the outcome
 bool ioopm_hash_table_is_empty(const ioopm_hash_table_t *ht)
 {
   	for(size_t i = 0; i < No_Buckets; i++)
@@ -160,7 +183,9 @@ bool ioopm_hash_table_is_empty(const ioopm_hash_table_t *ht)
    	return true;
 }
 
-// TODO: documentation
+/// @brief gives the size of the hashtable
+/// @param ht the hashtable
+/// @return the size of the hashtable as a size_t
 size_t ioopm_hash_table_size(const ioopm_hash_table_t *ht)
 {
   	size_t size = 0;
@@ -181,7 +206,6 @@ size_t ioopm_hash_table_size(const ioopm_hash_table_t *ht)
 
 
 /**
-* @file hash_table_iterator.h
 * @author Alex Egeberg, Eemeli Peura
 * @date Sep 2026
 * @brief Simple hash table iterator

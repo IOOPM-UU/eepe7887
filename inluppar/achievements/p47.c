@@ -1,5 +1,5 @@
 #include "ea_hash_table.h"
-//#include "hash_table_iterator.h"
+#include <hash_table_iterator.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -86,8 +86,7 @@ entry_t *find_previous_entry(ioopm_hash_table_t *ht, char *key)
     current = current->next;
   }
   return previous;
-  }
-
+}
 
 
 void ioopm_hash_table_insert(ioopm_hash_table_t *ht, char *key, int value)

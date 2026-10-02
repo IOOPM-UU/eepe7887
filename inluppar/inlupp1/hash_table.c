@@ -50,6 +50,10 @@ static entry_t *entry_create(elem_t *key, elem_t value, entry_t *next)
   	return entry;
 }
 
+/// @brief Creates a hashtable
+/// @param hash_fn hashing function used to hash all of the keys
+/// @param key_eq_fn equality function to check equality between keys
+/// @return hashtable
 ioopm_hash_table_t *ioopm_hash_table_create(ioopm_hash_function *hash_fn, ioopm_eq_function *key_eq_fn)
 {
   	ioopm_hash_table_t *ht = calloc(1, sizeof(ioopm_hash_table_t));
@@ -66,6 +70,8 @@ static entry_t *entry_destroy(entry_t *entry)
   	return entry;
 }
 
+/// @brief destroys the hashtable
+/// @param ht the hashtable to be destroyed
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht)
 {
  	for (size_t i = 0; i < No_Buckets; i++)
@@ -181,7 +187,6 @@ size_t ioopm_hash_table_size(ioopm_hash_table_t *ht)
 
 
 /**
-* @file hash_table_iterator.h
 * @author Alex Egeberg, Eemeli Peura
 * @date Sep 2026
 * @brief Simple hash table iterator

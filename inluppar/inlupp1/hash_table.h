@@ -5,13 +5,13 @@
 
 /**
 * @file hash_table.h
-* @author write both your names here
+* @author Alex Egeberg Eemeli Peura
 * @date write the date you started working on this
 * @brief Simple hash table that maps string keys to integer values.
 *
 * Here typically goes a more extensive explanation of what the header
 * defines. Doxygens tags are words preceeded by either a backslash @\
-* or by an at symbol @@.
+* or by an at symbol @@. 
 *
 */
 
@@ -44,11 +44,18 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, const elem_t *key, elem_t *
 /// @return the value mapped to by key (FIXME: what if the key does not exist?)
 bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, const elem_t *key);
 
-// TODO: documentation
+/// @brief looks inside the hashtable to see if the key exists
+/// @param ht the hashtable
+/// @param key the key to be found
+/// @return true or false depending on the outcome
 bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, const elem_t *key);
 
-// TODO: documentation
+/// @brief looks if the hashtable is empty or not
+/// @param ht the hashtable
+/// @return true or false depending on the outcome
 bool ioopm_hash_table_is_empty(const ioopm_hash_table_t *ht);
 
-// TODO: documentation
+/// @brief gives the size of the hashtable
+/// @param ht the hashtable
+/// @return the size of the hashtable as a size_t
 size_t ioopm_hash_table_size(const ioopm_hash_table_t *ht);

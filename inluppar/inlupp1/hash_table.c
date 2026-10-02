@@ -149,7 +149,7 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t *key)
 /// @param ht the hashtable
 /// @param key the key to be found
 /// @return true or false depending on the outcome
-bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, const elem_t *key)
+bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, elem_t *key)
 {
   	elem_t result;
    	return ioopm_hash_table_lookup(ht, key, &result);

@@ -2,6 +2,8 @@ CC = gcc
 FLAGS = -Wall -g --coverage
 LCUNIT = -lcunit
 
+
+
 HASH_OBJECTS=hash_table_test.o hash_table.o utils.o
 HASH_HEADERS=hash_table.h utils.h hash_table_iterator.h
 
@@ -73,3 +75,6 @@ linked_clean:
 
 .PHONY: linked_test linked_memtest linked_clean 
 
+
+optimering: freq_count
+	

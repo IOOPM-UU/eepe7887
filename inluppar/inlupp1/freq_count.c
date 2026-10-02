@@ -33,18 +33,20 @@ static size_t string_hash(elem_t key)
 
 void process_word(elem_t *word, ioopm_hash_table_t *ht)
 {
-
-elem_t my_elem;
+elem_t freq;
 // FIXME: Rewrite to match your own interface, error-handling, etc.
-bool exists = ioopm_hash_table_lookup(ht, word, &my_elem);
 
-   if (exists) {
-       ioopm_hash_table_insert(ht, word, int_elem(my_elem.i + 1)); // behåll gamla nyckeln
-   } else {
-       elem_t key = string_elem(strdup(word->s));
-       ioopm_hash_table_insert(ht, &key, int_elem(1));
+   if (ioopm_hash_table_lookup(ht, word, &freq)) 
+   {
+       ioopm_hash_table_insert(ht, word, int_elem(freq.i + 1));
+   } 
+    else {
+        elem_t key = string_elem(strdup(word->s));              
+        ioopm_hash_table_insert(ht, &key, int_elem(1));
    }
 }
+
+
 /// @brief Process a single file, updating the frequencies of its words
 /// @param filename the name of the file to process
 /// @param ht a hash table containing the frequencies of the words found so far
@@ -107,6 +109,7 @@ qsort(words, no_words, sizeof(struct freq_word), cmp_freq_words_reverse);
 }
 int main(int argc, char *argv[])
 {
+    
 if (argc < 2)
 {
 printf("Usage: %s file1 ... filen", argv[0]);

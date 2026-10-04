@@ -14,6 +14,11 @@ LINK_HEADERS=linked_list.h list_iterator.h common.h
 
 $(LINK_OBJECTS):$(LINK_HEADERS)
 
+FREQ_OBJECTS=freq_count.o hash_table.o linked_list.o utils.o
+
+$(FREQ_OBJECTS): $(HASH_HEADERS) $(LINK_HEADERS)
+
+
 %.o: %.c
 	$(CC) $(FLAGS) -c $< -o $@
 	
@@ -36,6 +41,10 @@ clean_all:
 	rm -f *.o hash_table_test link_test_combined *.gcda *.gcno *.gcov
 
 .PHONY: run_all mem_all clean_all coverage_all
+
+freq_count: $(FREQ_OBJECTS)
+	$(CC) $(FLAGS) $^ -o $@
+
 
 
 hash_table_test: $(HASH_OBJECTS)

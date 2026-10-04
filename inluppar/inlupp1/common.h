@@ -5,6 +5,8 @@
 
 typedef union elem elem_t;
 
+
+/// @brief union for an element that can be either of the types inside of the union
 union elem
 {
   int i;

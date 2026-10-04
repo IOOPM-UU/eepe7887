@@ -115,51 +115,42 @@ int main(int argc, char *argv[])
 {
     if (argc < 2)
     {
-        printf("Usage: %s file1 ... filen", argv[0]);
+        printf("Usage: %s file1 ... filen\n", argv[0]);
         return 1;
     }
-    
-if (argc < 2)
-{
-printf("Usage: %s file1 ... filen", argv[0]);
-return 1;
-}
-ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_cmpr);
-for (int i = 1; i < argc; ++i)
-{
-process_file(argv[i], ht);
-}
-int size = ioopm_hash_table_size(ht);
-int i = 0;
-struct freq_word freq_words[size];
-ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht);
-while (i < size) {
 
     ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_cmpr);
 
     for (int i = 1; i < argc; ++i)
     {
         process_file(argv[i], ht);
-    
+    }
+
+    int size = ioopm_hash_table_size(ht);
+    struct freq_word freq_words[size];
+
+    ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht);
+    for (int i = 0; i < size; i++)
+    {
         freq_words[i].word = ioopm_hash_table_iterator_current_key(it);
         freq_words[i].freq = ioopm_hash_table_iterator_current_value(it);
-
-        i++;
-
         ioopm_hash_table_iterator_advance(it);
     }
-}
+    ioopm_hash_table_iterator_destroy(it);
 
-    // FIXME: Iterate over hash table to dump its words and
-    // frequencies into the array above
     sort_freq_words(freq_words, size);
     for (int i = 0; i < size; ++i)
     {
         printf("%s: %d\n", freq_words[i].word->s, freq_words[i].freq.i);
     }
-    printf("SIZE: %d", size);
-    // FIXME: Leaks memory! Use valgrind to find out where that memory is
-    // being allocated, and then insert code here to free it.
+    printf("SIZE: %d\n", size);
+
+    // Frigör strängarna innan tabellen förstörs
+    for (int i = 0; i < size; ++i)
+    {
+        free(freq_words[i].word->s);
+    }
 
     ioopm_hash_table_destroy(ht);
+    return 0;
 }

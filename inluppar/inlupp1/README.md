@@ -25,6 +25,11 @@ Kräver: gcc, make, CUnit, valgrind och gcov
 
 Exempel: './freq_count <10k-words.txt>
 
+## Initial Profiling Results
+*
+*
+*
+
 ## Designbeslut
 
 *

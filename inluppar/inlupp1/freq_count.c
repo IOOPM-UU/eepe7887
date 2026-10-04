@@ -37,14 +37,16 @@ void process_word(elem_t *word, ioopm_hash_table_t *ht)
 elem_t freq;
 // FIXME: Rewrite to match your own interface, error-handling, etc.
 
-   if (ioopm_hash_table_lookup(ht, word, &freq)) 
-   {
-       ioopm_hash_table_insert(ht, word, int_elem(freq.i + 1));
-   } 
-    else {
+    
+    if (ioopm_hash_table_lookup(ht, word, &freq))  // If exists insert and add to frequency
+    {
+         ioopm_hash_table_insert(ht, word, int_elem(freq.i + 1));
+    } 
+    else // else doesn't exist and we insert it into the table and set the frequency to 1
+    {
         elem_t key = string_elem(strdup(word->s));              
         ioopm_hash_table_insert(ht, &key, int_elem(1));
-   }
+    }
 }
 
 
@@ -143,13 +145,9 @@ int main(int argc, char *argv[])
     {
         printf("%s: %d\n", freq_words[i].word->s, freq_words[i].freq.i);
     }
-    printf("SIZE: %d\n", size);
-
-    // Frigör strängarna innan tabellen förstörs
-    for (int i = 0; i < size; ++i)
-    {
-        free(freq_words[i].word->s);
-    }
+    printf("SIZE: %d", size);
+    // FIXME: Leaks memory! Use valgrind to find out where that memory is
+    // being allocated, and then insert code here to free it.
 
     ioopm_hash_table_destroy(ht);
     return 0;

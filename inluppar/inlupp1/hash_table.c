@@ -67,7 +67,7 @@ static entry_t *entry_destroy(entry_t *entry)
   	entry_t *next = entry->next;
   	free(entry);
   	entry = next;
-  	return entry;
+  	return entry; // Returns the next element while freeing the entry we want to destroy
 }
 
 /// @brief destroys the hashtable
@@ -145,17 +145,14 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t *key)
     }
 }
 
-/// @brief looks inside the hashtable to see if the key exists
-/// @param ht the hashtable
-/// @param key the key to be found
-/// @return true or false depending on the outcome
+
 bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, elem_t *key)
 {
   	elem_t result;
    	return ioopm_hash_table_lookup(ht, key, &result);
 }
 
-// TODO: documentation
+
 bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht)
 {
   	for(size_t i = 0; i < No_Buckets; i++)
@@ -169,7 +166,7 @@ bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht)
    	return true;
 }
 
-// TODO: documentation
+
 size_t ioopm_hash_table_size(ioopm_hash_table_t *ht)
 {
   	size_t size = 0;

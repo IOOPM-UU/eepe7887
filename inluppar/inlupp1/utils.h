@@ -1,30 +1,37 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 #include <stdbool.h>
+
+/// @brief union for an answer that can be either of the types inside the union
 typedef union { 
   int   int_value;
   float float_value;
   char *string_value;
 } answer_t;
+
+
 typedef bool check_func(char*);
+
 typedef answer_t convert_func(char*);
-int read_string(char *buf, int buf_siz);
-bool is_number(char *str);
-char *ask_question_string(char *question);
-int ask_question_int(char *question);
-bool is_number(char *str);
-answer_t ask_question(char *question, check_func *check, convert_func *convert);
-bool is_number(char *str);
-bool not_empty(char *str);
+
+
 extern char *strdup(const char *);
-char *ask_question_shelf(char *question);
-bool is_shelf(char *star);
-void cp(char *filename);
-char *ask_question_menu(char *question);
 
+/// @brief Reads a string and returns an int that represents the size of the string
+/// @param buf the buffer
+/// @param buf_siz the buffers size
+/// @return 
+int read_string(char *buf, int buf_siz);
 
+/// @brief Takes in a string to check if it's a number or not
+/// @param str a string
+/// @return boolean true or false
+bool is_number(char *str);
 
-
+/// @brief Takes in a string to see if it's not empty
+/// @param str a string
+/// @return boolean true or false
+bool not_empty(char *str);
 
 
 #endif 

@@ -35,6 +35,7 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, elem_t *key, elem_t value);
 /// @brief lookup value for key in hash table ht
 /// @param ht hash table operated upon
 /// @param key key to lookup
+/// @param result a pointer to an element that will be changed to a pointer to key if it is found
 /// @return the value mapped to by key if true else return false
 bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, elem_t *key, elem_t *result);
 

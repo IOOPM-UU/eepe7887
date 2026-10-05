@@ -27,10 +27,6 @@ static bool string_eq(elem_t a, elem_t b)
   return strcmp(a.s, b.s) == 0;
 }
 
-static ioopm_hash_table_t *create_ht(void)
-{
-  return ioopm_hash_table_create(string_hash, string_eq);
-}
 
 void test_create_destroy()
 {

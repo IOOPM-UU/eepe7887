@@ -122,7 +122,6 @@ elem_t ioopm_list_remove(ioopm_list_t *list, size_t index)
 {
     link_t *first_link = list->first->next;
     size_t i = 0;
-    elem_t no_elem;
 
 
     while(first_link != list->last)
@@ -143,13 +142,12 @@ elem_t ioopm_list_remove(ioopm_list_t *list, size_t index)
         first_link = first_link->next;
         i++;
     }
-    return no_elem;
+    return list->last->value;   //If the index is not found, return the value of the sentinel node
 }
 
 elem_t ioopm_list_get(ioopm_list_t *list, size_t index)
 {
     link_t *first_link = list->first->next;
-    elem_t no_elem;
 
     size_t i = 0;
     while(first_link != list->last)
@@ -162,7 +160,7 @@ elem_t ioopm_list_get(ioopm_list_t *list, size_t index)
         i++;
     }
 
-    return no_elem;
+    return list->last->value;   //If the index is not found, return the value of the sentinel node
 }
 
 size_t ioopm_list_size(ioopm_list_t *list)

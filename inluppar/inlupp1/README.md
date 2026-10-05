@@ -20,8 +20,8 @@ Minneskontroll och täckning:
 ## Köra frekvensräknaren
 
     make 1k-words       # freq_count med .txt fil som har 1000 långa ord
-    make 10k-words      # freq_count med .txt fil som har 10 000 ord
-    make 16k-words      # freq_count med .txt fil som har 16 000 ord
+    make 10k-words      # freq_count med .txt fil som har 10000 ord
+    make 16k-words      # freq_count med .txt fil som har 16000 ord
 
 ## Initial Profiling Results
 
@@ -31,7 +31,7 @@ Minneskontroll och täckning:
 
 ## Designbeslut
 
-* Returna sentinel node grejen?
-* Behålla hashtable grejer med hashtable iterator grejer i samma fil
-* Olika testfiler för att kunna köra individuella samt alla tester smidigare eller något
+* Ett designbeslut vi tog var att vi valde att använda oss av sentinel nodes hellre än dubbelpekare, detta var för att det skulle bli lättare att förstå eftersom vi redan använt oss av sentinel nodes i tidigare tickets.
+
+* Ett annat designbeslut vi tog var att i 'hash_table.c' så valde vi att skriva både våra hash_table funktioner samt våra hash_table_iterator funktioner. Detta var för att vi själva tyckte att det var lättare att ha allt i en och samma fil hellre än två separata filer.
 

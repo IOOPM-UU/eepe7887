@@ -42,6 +42,7 @@ clean_all:
 
 .PHONY: run_all mem_all clean_all coverage_all
 
+
 freq_count: $(FREQ_OBJECTS)
 	$(CC) $(FLAGS) $^ -o $@
 
@@ -91,7 +92,4 @@ linked_clean:
 	rm -f *.o link_test_combined *.gcda *.gcno *.gcov
 
 .PHONY: linked_test linked_memtest linked_clean 
-
-
-optimering: freq_count
 	

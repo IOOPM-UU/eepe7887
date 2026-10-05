@@ -236,7 +236,6 @@ elem_t ioopm_list_iterator_remove(ioopm_list_iterator_t *iter)
      ? tmp->previous 
      : tmp->next;
 
-    free(tmp);
     iter->list->size = iter->list->size - 1;
     return value;
 

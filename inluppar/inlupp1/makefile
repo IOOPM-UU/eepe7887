@@ -16,7 +16,7 @@ $(LINK_OBJECTS):$(LINK_HEADERS)
 
 FREQ_OBJECTS=freq_count.o hash_table.o linked_list.o utils.o
 
-$(FREQ_OBJECTS): $(HASH_HEADERS) $(LINK_HEADERS)
+$(FREQ_OBJECTS): $(HASH_HEADERS) $(LINK_HEADERS
 
 
 %.o: %.c
@@ -44,7 +44,6 @@ clean_all:
 
 freq_count: $(FREQ_OBJECTS)
 	$(CC) $(FLAGS) $^ -o $@
-
 
 
 hash_table_test: $(HASH_OBJECTS)

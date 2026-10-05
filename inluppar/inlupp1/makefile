@@ -91,7 +91,4 @@ linked_clean:
 	rm -f *.o link_test_combined *.gcda *.gcno *.gcov
 
 .PHONY: linked_test linked_memtest linked_clean 
-
-
-optimering: freq_count
 	

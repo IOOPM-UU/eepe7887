@@ -31,7 +31,7 @@ Minneskontroll och täckning:
 
 ## Designbeslut
 
-* 
-* 
-* 
+* Returna sentinel node grejen?
+* Behålla hashtable grejer med hashtable iterator grejer i samma fil
+* Olika testfiler för att kunna köra individuella samt alla tester smidigare eller något
 

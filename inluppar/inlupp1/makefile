@@ -16,7 +16,7 @@ $(LINK_OBJECTS):$(LINK_HEADERS)
 
 FREQ_OBJECTS=freq_count.o hash_table.o linked_list.o utils.o
 
-$(FREQ_OBJECTS): $(HASH_HEADERS) $(LINK_HEADERS
+$(FREQ_OBJECTS): $(HASH_HEADERS)
 
 
 %.o: %.c
@@ -38,12 +38,21 @@ coverage_all: run_all
 	gcov -b -c -f linked_list.c hash_table.c
 
 clean_all:
-	rm -f *.o hash_table_test link_test_combined *.gcda *.gcno *.gcov
+	rm -f *.o hash_table_test link_test_combined freq_count *.gcda *.gcno *.gcov
 
 .PHONY: run_all mem_all clean_all coverage_all
 
 freq_count: $(FREQ_OBJECTS)
 	$(CC) $(FLAGS) $^ -o $@
+
+1k-words: freq_count
+	./freq_count 1k-long-words.txt
+
+10k-words: freq_count
+	./freq_count 10k-words.txt
+
+16k-words: freq_count
+	./freq_count 16k-words.txt
 
 
 hash_table_test: $(HASH_OBJECTS)

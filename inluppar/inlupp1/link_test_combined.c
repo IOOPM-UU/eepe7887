@@ -442,7 +442,62 @@ void test_iter_remove_and_insert_string()
     ioopm_list_iterator_destroy(iter);
     ioopm_list_destroy(list);
 }
+void test_get_invalid_index()
+{
+    ioopm_list_t *list = ioopm_list_create();
 
+    // Empty list: loop never runs, sentinel value is returned
+    elem_t from_empty = ioopm_list_get(list, 0);
+
+    ioopm_list_append(list, int_elem(12));
+    ioopm_list_append(list, int_elem(13));
+
+    size_t one_past_end = ioopm_list_size(list); // 2, first invalid index
+    size_t far_away = 1000;
+
+    elem_t past_end = ioopm_list_get(list, one_past_end);
+    elem_t too_far = ioopm_list_get(list, far_away);
+
+    size_t size = ioopm_list_size(list);
+
+    ioopm_list_destroy(list);
+
+    CU_ASSERT_EQUAL(from_empty.i, 0);
+    CU_ASSERT_EQUAL(past_end.i, 0);
+    CU_ASSERT_EQUAL(too_far.i, 0);
+    CU_ASSERT_EQUAL(size, 2); // get must not modify the list
+}
+
+void test_remove_invalid_index()
+{
+    ioopm_list_t *list = ioopm_list_create();
+
+    elem_t from_empty = ioopm_list_remove(list, 0);
+    size_t size_after_empty = ioopm_list_size(list);
+
+    ioopm_list_append(list, int_elem(12));
+    ioopm_list_append(list, int_elem(13));
+
+    size_t one_past_end = ioopm_list_size(list);
+    size_t far_away = 1000;
+
+    elem_t past_end = ioopm_list_remove(list, one_past_end);
+    elem_t too_far = ioopm_list_remove(list, far_away);
+
+    size_t size = ioopm_list_size(list);
+    elem_t head = ioopm_list_head(list);
+    elem_t tail = ioopm_list_last(list);
+
+    ioopm_list_destroy(list);
+
+    CU_ASSERT_EQUAL(from_empty.i, 0);
+    CU_ASSERT_EQUAL(size_after_empty, 0);
+    CU_ASSERT_EQUAL(past_end.i, 0);
+    CU_ASSERT_EQUAL(too_far.i, 0);
+    CU_ASSERT_EQUAL(size, 2);   // nothing was removed
+    CU_ASSERT_EQUAL(head.i, 12);
+    CU_ASSERT_EQUAL(tail.i, 13);
+}
 int main() {
   // First we try to set up CUnit, and exit if we fail
   if (CU_initialize_registry() != CUE_SUCCESS)
@@ -481,7 +536,11 @@ int main() {
     CU_add_test(my_test_suite, "TEST remove first and last (string)", test_remove_first_and_last_string) == NULL ||
     CU_add_test(my_test_suite, "Test iter on list (string)", test_iter_on_list_string) == NULL ||
     CU_add_test(my_test_suite, "Test iter advance (string)", test_iter_advance_string) == NULL ||
-    CU_add_test(my_test_suite, "Test iter remove and insert (string)", test_iter_remove_and_insert_string) == NULL)
+    CU_add_test(my_test_suite, "Test iter remove and insert (string)", test_iter_remove_and_insert_string) == NULL ||
+    CU_add_test(my_test_suite, "Test remove invalid index", test_remove_invalid_index) == NULL ||
+    CU_add_test(my_test_suite, "Test get invalid index", test_get_invalid_index) == NULL
+
+)
     
   )
   )

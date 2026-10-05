@@ -20,8 +20,8 @@ Minneskontroll och täckning:
 ## Köra frekvensräknaren
 
     make 1k-words       # freq_count med .txt fil som har 1000 långa ord
-    make 10k-words      # freq_count med .txt fil som har 10 000 ord
-    make 16k-words      # freq_count med .txt fil som har 16 000 ord
+    make 10k-words      # freq_count med .txt fil som har 10000 ord
+    make 16k-words      # freq_count med .txt fil som har 16000 ord
 
 ## Initial Profiling Results
 

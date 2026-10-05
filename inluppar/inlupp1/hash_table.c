@@ -41,7 +41,7 @@ struct hash_table
 
 
 
-static entry_t *entry_create(elem_t *key, elem_t value, entry_t *next)
+static entry_t *entry_create(const elem_t *key, elem_t value, entry_t *next)
 {
   	entry_t *entry = calloc(1, sizeof(entry_t));
   	entry->key = *key;
@@ -85,7 +85,7 @@ void ioopm_hash_table_destroy(ioopm_hash_table_t *ht)
    	free(ht);
 }
 
-static entry_t *find_previous_entry(ioopm_hash_table_t *ht, elem_t *key)
+static entry_t *find_previous_entry(ioopm_hash_table_t *ht, const elem_t *key)
 {
 	size_t bucket = ht->hash_fn(*key) % No_Buckets;
 
@@ -99,7 +99,7 @@ static entry_t *find_previous_entry(ioopm_hash_table_t *ht, elem_t *key)
     return previous;
 }
 
-void ioopm_hash_table_insert(ioopm_hash_table_t *ht, elem_t *key, elem_t value)
+void ioopm_hash_table_insert(ioopm_hash_table_t *ht, const elem_t *key, elem_t value)
 {
   	entry_t *previous = find_previous_entry(ht, key);
 
@@ -109,11 +109,11 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, elem_t *key, elem_t value)
     }
     else
     {
-      	previous->next= entry_create(key, value, NULL);
+      	previous->next = entry_create(key, value, NULL);
     }
 }
 
-bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, elem_t *key, elem_t *result)
+bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, const elem_t *key, elem_t *result)
 {
 	entry_t *previous = find_previous_entry(ht, key);
   	// if the key exists, return the value, otherwise, indicate that the lookup failed
@@ -128,7 +128,7 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, elem_t *key, elem_t *result
   	}
 }
 
-bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t *key)
+bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, const elem_t *key)
 {
   	elem_t result;
    	entry_t *previous = find_previous_entry(ht, key);
@@ -146,14 +146,14 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t *key)
 }
 
 
-bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, elem_t *key)
+bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, const elem_t *key)
 {
   	elem_t result;
    	return ioopm_hash_table_lookup(ht, key, &result);
 }
 
 
-bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht)
+bool ioopm_hash_table_is_empty(const ioopm_hash_table_t *ht)
 {
   	for(size_t i = 0; i < No_Buckets; i++)
    	{
@@ -167,7 +167,7 @@ bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht)
 }
 
 
-size_t ioopm_hash_table_size(ioopm_hash_table_t *ht)
+size_t ioopm_hash_table_size(const ioopm_hash_table_t *ht)
 {
   	size_t size = 0;
 
@@ -249,7 +249,7 @@ void ioopm_hash_table_iterator_destroy(ioopm_hash_table_iterator_t *it)
 /// @brief Check if the current element exists, or equivalently, if it is positioned at an entry
 /// @param it iterator operated upon
 /// @return true iff the current element exists
-bool ioopm_hash_table_iterator_at_end(ioopm_hash_table_iterator_t *it)
+bool ioopm_hash_table_iterator_at_end(const ioopm_hash_table_iterator_t *it)
 {
   	return it->current_bucket == No_Buckets;
 }
@@ -267,7 +267,7 @@ void ioopm_hash_table_iterator_advance(ioopm_hash_table_iterator_t *it)
 /// @pre it is positioned at an entry
 /// @param it iterator operated upon
 /// @return the key of the current entry
-elem_t *ioopm_hash_table_iterator_current_key(ioopm_hash_table_iterator_t *it)
+elem_t *ioopm_hash_table_iterator_current_key(const ioopm_hash_table_iterator_t *it)
 {
   	return &it->current_entry->key;
 }
@@ -276,7 +276,7 @@ elem_t *ioopm_hash_table_iterator_current_key(ioopm_hash_table_iterator_t *it)
 /// @pre it is positioned at an entry
 /// @param it iterator operated upon
 /// @return the value if the current entry
-elem_t ioopm_hash_table_iterator_current_value(ioopm_hash_table_iterator_t *it)
+elem_t ioopm_hash_table_iterator_current_value(const ioopm_hash_table_iterator_t *it)
 {
   	return it->current_entry->value;
 }

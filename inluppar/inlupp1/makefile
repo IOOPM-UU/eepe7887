@@ -42,6 +42,7 @@ clean_all:
 
 .PHONY: run_all mem_all clean_all coverage_all
 
+
 freq_count: $(FREQ_OBJECTS)
 	$(CC) $(FLAGS) $^ -o $@
 

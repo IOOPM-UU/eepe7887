@@ -3,7 +3,8 @@
 ## Bygga och köra tester
 
     make                # kompilerar alla program
-    make test           # kompilerar och kör alla tester (HAR VI LAGT TILL FREQ_COUNT?)
+    make all_test       # kompilerar alla tester
+    make run_all        # kör alla tester
     make clean          # tar bort alla byggfiler
 
 Enskilda tester:
@@ -24,18 +25,13 @@ Minneskontroll och täckning:
 
 ## Initial Profiling Results
 
-*
-*
-*
+* 
+* 
+* 
 
 ## Designbeslut
 
-*
-*
-*
+* 
+* 
+* 
 
-## Antaganden
-
-*
-*
-*

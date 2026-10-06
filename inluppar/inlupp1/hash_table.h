@@ -17,6 +17,24 @@
 
 typedef struct hash_table ioopm_hash_table_t;
 
+typedef struct entry entry_t;
+
+struct entry
+{
+  	elem_t key;     // holds the key
+  	elem_t value;     // holds the value
+  	entry_t *next; // points to the next entry (possibly NULL)
+};
+struct hash_table
+{
+  	// NOTE: addressing this dodge is optional.
+  	entry_t *buckets;
+	float load_factor;
+	size_t size;
+    size_t bucket_count;
+  	ioopm_hash_function *hash_fn;
+  	ioopm_eq_function *key_eq_fn;
+};
 
 /// @brief Create a new hash table
 /// @return A new empty hash table

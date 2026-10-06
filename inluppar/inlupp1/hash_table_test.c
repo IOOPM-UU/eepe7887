@@ -384,6 +384,72 @@ void test_int_keys()
   ioopm_hash_table_destroy(ht);
 }
 
+void test_resize_many_entries()
+{
+  const int N = 1000;
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(int_hash, int_eq);
+  size_t initial_buckets = ht->bucket_count;
+
+  // 1. Sätt in många nycklar (tillräckligt för att passera load factor flera gånger)
+  for (int i = 0; i < N; i++)
+  {
+    elem_t key = int_elem(i);
+    ioopm_hash_table_insert(ht, &key, int_elem(i * 10));
+  }
+
+  // 2. Tabellen ska ha vuxit och storleken ska stämma
+  CU_ASSERT_TRUE(ht->bucket_count > initial_buckets);
+  CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), N);
+
+  // 3. Alla nycklar ska fortfarande gå att slå upp med rätt värde
+  int all_found = 0;
+  for (int i = 0; i < N; i++)
+  {
+    elem_t key = int_elem(i);
+    elem_t result = int_elem(-1);
+    if (ioopm_hash_table_lookup(ht, &key, &result) && result.i == i * 10)
+    {
+      all_found++;
+    }
+  }
+  CU_ASSERT_EQUAL(all_found, N);
+
+  // 4. Iteratorn ska besöka exakt N entries
+  int iteration_count = 0;
+  ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht);
+  while (!ioopm_hash_table_iterator_at_end(it))
+  {
+    iteration_count++;
+    ioopm_hash_table_iterator_advance(it);
+  }
+  ioopm_hash_table_iterator_destroy(it);
+  CU_ASSERT_EQUAL(iteration_count, N);
+
+  // 5. Uppdatering av befintlig nyckel ska inte öka storleken
+  elem_t existing = int_elem(42);
+  ioopm_hash_table_insert(ht, &existing, int_elem(999));
+  elem_t result = int_elem(0);
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, &existing, &result));
+  CU_ASSERT_EQUAL(result.i, 999);
+  CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), N);
+
+  // 6. Ta bort varannan nyckel, resten ska finnas kvar
+  for (int i = 0; i < N; i += 2)
+  {
+    elem_t key = int_elem(i);
+    CU_ASSERT_TRUE(ioopm_hash_table_remove(ht, &key));
+  }
+  CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), N / 2);
+
+  for (int i = 0; i < N; i++)
+  {
+    elem_t key = int_elem(i);
+    CU_ASSERT_EQUAL(ioopm_hash_table_has_key(ht, &key), i % 2 == 1);
+  }
+
+  ioopm_hash_table_destroy(ht);
+}
+
 int main()
 {
   if (CU_initialize_registry() != CUE_SUCCESS)
@@ -413,7 +479,8 @@ int main()
     (CU_add_test(my_test_suite, "Test entries in same bucket", test_entries_in_same_bucket) == NULL) ||
     (CU_add_test(my_test_suite, "Test remove no exist", test_remove_noexist_entry) == NULL) ||
     (CU_add_test(my_test_suite, "Test insert inuse", test_insert_inuse) == NULL ||
-    CU_add_test(my_test_suite, "Test int keys", test_int_keys) == NULL)
+    CU_add_test(my_test_suite, "Test int keys", test_int_keys) == NULL ||
+    CU_add_test(my_test_suite, "Test resize with many entries", test_resize_many_entries) == NULL)
   )
   {
     CU_cleanup_registry();

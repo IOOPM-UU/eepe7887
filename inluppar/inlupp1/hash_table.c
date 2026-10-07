@@ -34,7 +34,7 @@ ioopm_hash_table_t *ioopm_modular_hash_table_create(ioopm_hash_function *hash_fn
 {
 	ioopm_hash_table_t *ht = calloc(1, sizeof(ioopm_hash_table_t));
 
-	ht->buckets = calloc(capacity, sizeof(entry_t));
+	ht->buckets = calloc(capacity, sizeof(entry_t *));
 	ht->hash_fn = hash_fn;
 	ht->key_eq_fn = key_eq_fn;
 	ht->load_factor = load_factor;
@@ -62,7 +62,7 @@ void ioopm_hash_table_destroy(ioopm_hash_table_t *ht)
 {
  	for (size_t i = 0; i < ht->bucket_count; i++)
   	{
-    	entry_t *current = ht->buckets[i].next;
+    	entry_t *current = ht->buckets[i];
      	while (current != NULL)
     	{
       		current = entry_destroy(current);
@@ -89,20 +89,20 @@ static void rehash(ioopm_hash_table_t *ht)
 
 	size_t new_count = primes[i];
 	size_t old_buckets = ht->bucket_count;
-	entry_t *old_entries = ht->buckets;
+	entry_t **old_entries = ht->buckets;
 
 	ht->buckets = calloc(new_count, sizeof(entry_t));
 	ht->bucket_count = new_count;
 	
 	for(size_t i = 0; i < old_buckets; i++)
 	{
-		entry_t *current = old_entries[i].next;
+		entry_t *current = old_entries[i];
 		while(current != NULL)
 		{
 			entry_t *next = current->next;
       		size_t modul = ht->hash_fn(current->key) % new_count;
-      		current->next = ht->buckets[modul].next; 
-      		ht->buckets[modul].next = current;
+      		current->next = ht->buckets[modul]; 
+      		ht->buckets[modul] = current;
       		current = next;
 		}
 
@@ -114,7 +114,7 @@ static entry_t **find_link(ioopm_hash_table_t *ht, const elem_t *key)
 {
 	size_t bucket = ht->hash_fn(*key) % ht->bucket_count;
 
-	entry_t **current = &(ht->buckets[bucket].next); // current börjar på första länken i bucketen och pekar på next-fältet
+	entry_t **current = &(ht->buckets[bucket]); // ht->buckets[bucket] är bucketens första länk (platsen som innehåller en pekare till första entryn), '&' ger adressen till den
 	while (*current != NULL && !ht->key_eq_fn((*current)->key, *key)) // så länge länken pekar på en entry och entryns nyckel inte är den vi letar efter
 	{
      	current = &((*current)->next); // ska vara av typ **, därav '&' framför det hela
@@ -183,7 +183,7 @@ bool ioopm_hash_table_is_empty(const ioopm_hash_table_t *ht)
 {
   	for(size_t i = 0; i < ht->bucket_count; i++)
    	{
-    	entry_t *bucket = ht->buckets[i].next;
+    	entry_t *bucket = ht->buckets[i];
      	if(bucket != NULL)
     	{
       		return false;

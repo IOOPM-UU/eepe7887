@@ -29,7 +29,7 @@ struct entry
 struct hash_table
 {
   	// NOTE: addressing this dodge is optional.
-  	entry_t *buckets;
+  	entry_t **buckets;
 	float load_factor;
 	size_t size;
     size_t bucket_count;

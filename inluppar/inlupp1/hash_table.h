@@ -25,6 +25,7 @@ struct entry
   	elem_t value;     // holds the value
   	entry_t *next; // points to the next entry (possibly NULL)
 };
+
 struct hash_table
 {
   	// NOTE: addressing this dodge is optional.
@@ -35,6 +36,7 @@ struct hash_table
   	ioopm_hash_function *hash_fn;
   	ioopm_eq_function *key_eq_fn;
 };
+
 
 /// @brief Create a new hash table
 /// @return A new empty hash table

@@ -6,7 +6,6 @@
 #include <stdbool.h>
 #include <string.h>
 #include <ctype.h>
-#define No_Buckets 17
 #define int_elem(x)   ((elem_t) { .i = (x) })
 #define bool_elem(x)  ((elem_t) { .b = (x) })
 #define ptr_elem(x)   ((elem_t) { .p = (x) })
@@ -34,7 +33,10 @@ struct hash_table_iterator
 struct hash_table
 {
   	// NOTE: addressing this dodge is optional.
-  	entry_t buckets[No_Buckets];
+  	entry_t *buckets;
+	float load_factor;
+	size_t size;
+    size_t bucket_count;
   	ioopm_hash_function *hash_fn;
   	ioopm_eq_function *key_eq_fn;
 };
@@ -56,34 +58,26 @@ static entry_t *entry_create(const elem_t *key, elem_t value, entry_t *next)
 /// @return hashtable
 ioopm_hash_table_t *ioopm_hash_table_create(ioopm_hash_function *hash_fn, ioopm_eq_function *key_eq_fn)
 {
-  	ioopm_hash_table_t *ht = calloc(1, sizeof(ioopm_hash_table_t));
-	ht->buckets = calloc(No_Buckets, sizeof(entry_t));  	
-	ht->hash_fn = hash_fn;
-  	ht->key_eq_fn = key_eq_fn;
-	ht->load_factor = 0.75;
-	ht->bucket_count = No_Buckets;
-  	return ht;
+  	return ioopm_modular_hash_table_create(hash_fn, key_eq_fn, 17, 0.75);
 }
-/*
-ioopm_hash_table_t *ioopm_modular_hash_table_create(ioopm_hash_function *hash_fn, ioopm_eq_function *key_eq_fn, size_t size, float load_factor)
-{
-	
 
+ioopm_hash_table_t *ioopm_modular_hash_table_create(ioopm_hash_function *hash_fn, ioopm_eq_function *key_eq_fn, size_t capacity, float load_factor)
+{
 	ioopm_hash_table_t *ht = calloc(1, sizeof(ioopm_hash_table_t));
+
+	ht->buckets = calloc(capacity, sizeof(entry_t));
 	ht->hash_fn = hash_fn;
-  	ht->key_eq_fn = key_eq_fn;
+	ht->key_eq_fn = key_eq_fn;
 	ht->load_factor = load_factor;
-	ht->size = size;
+	ht->bucket_count = capacity;
+
 	return ht;
 }
-*/
 
-bool size_check(ioopm_hash_table_t *ht)
+bool growth_check(ioopm_hash_table_t *ht)
 {
 	return ht->size >= ht->bucket_count * ht->load_factor;
 }
-
-
 
 static entry_t *entry_destroy(entry_t *entry)
 {
@@ -147,47 +141,44 @@ static void rehash(ioopm_hash_table_t *ht)
 	free(old_entries);
 }
 
-static entry_t *find_previous_entry(ioopm_hash_table_t *ht, const elem_t *key)
+static entry_t **find_link(ioopm_hash_table_t *ht, const elem_t *key)
 {
 	size_t bucket = ht->hash_fn(*key) % ht->bucket_count;
 
-	entry_t *previous = &ht->buckets[bucket];
-	entry_t *current = ht->buckets[bucket].next;
-	while (current != NULL && !ht->key_eq_fn(current->key, *key))
+	entry_t **current = &(ht->buckets[bucket].next); // current börjar på första länken i bucketen och pekar på next-fältet
+	while (*current != NULL && !ht->key_eq_fn((*current)->key, *key)) // så länge länken pekar på en entry och entryns nyckel inte är den vi letar efter
 	{
-   		previous = current;
-     	current = current->next;
+     	current = &((*current)->next); // ska vara av typ **, därav '&' framför det hela
     }
-    return previous;
+    return current;
 }
 
 void ioopm_hash_table_insert(ioopm_hash_table_t *ht, const elem_t *key, elem_t value)
 {
-	if(size_check(ht))
+	if(growth_check(ht))
 	{
 		rehash(ht);
 	}
-  	entry_t *previous = find_previous_entry(ht, key);
+  	entry_t **link = find_link(ht, key);
 
-   	if (previous->next != NULL)
+   	if (*(link) != NULL)
     {
-    	previous->next->value = value;
+    	(*link)->value = value;
     }
     else
     {
-      	previous->next= entry_create(key, value, NULL);
 		ht->size++;
-      	previous->next = entry_create(key, value, NULL);
+      	*link = entry_create(key, value, NULL);
     }
 }
 
 bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, const elem_t *key, elem_t *result)
 {
-	entry_t *previous = find_previous_entry(ht, key);
+	entry_t **link = find_link(ht, key);
   	// if the key exists, return the value, otherwise, indicate that the lookup failed
-	if (previous->next != NULL)
+	if ((*link) != NULL)
   	{
-    	*result = previous->next->value;
+    	*result = (*link)->value;
     	return true;
   	}
   	else
@@ -198,12 +189,11 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, const elem_t *key, elem_t *
 
 bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, const elem_t *key)
 {
-  	elem_t result;
-   	entry_t *previous = find_previous_entry(ht, key);
+   	entry_t **link = find_link(ht, key);
 
-    if (ioopm_hash_table_lookup(ht, key, &result))
+    if (*link != NULL)
     {
-    	previous->next = entry_destroy(previous->next);
+    	*link = entry_destroy(*link);
 		ht->size--;
      	return true;
     }
@@ -237,19 +227,7 @@ bool ioopm_hash_table_is_empty(const ioopm_hash_table_t *ht)
 
 size_t ioopm_hash_table_size(const ioopm_hash_table_t *ht)
 {
-  	size_t size = 0;
-
-   	for(size_t i = 0; i < ht->bucket_count; i++)
-    {
-    	entry_t *bucket = ht->buckets[i].next;
-     	while(bucket != NULL)
-      	{
-      		entry_t *next = bucket->next;
-       		bucket = next;
-         	size++;
-       	}
-    }
-    return size;
+    return ht->size;
 }
 
 
@@ -278,7 +256,7 @@ static void advance_iterator_state(ioopm_hash_table_iterator_t *it)
     	it->current_bucket += 1;
 
      	// if the next bucket existed, update the current entry
-      	if (it->current_bucket != No_Buckets)
+      	if (it->current_bucket != it->ht->bucket_count)
     	{
       		it->current_entry = &it->ht->buckets[it->current_bucket];
      	}
@@ -287,7 +265,7 @@ static void advance_iterator_state(ioopm_hash_table_iterator_t *it)
 
 static void skip_sentinel_nodes(ioopm_hash_table_iterator_t *it)
 {
-  	while (it->current_bucket != No_Buckets &&
+  	while (it->current_bucket != it->ht->bucket_count &&
           it->current_entry == &it->ht->buckets[it->current_bucket])
    	{
     	advance_iterator_state(it);
@@ -319,7 +297,7 @@ void ioopm_hash_table_iterator_destroy(ioopm_hash_table_iterator_t *it)
 /// @return true iff the current element exists
 bool ioopm_hash_table_iterator_at_end(const ioopm_hash_table_iterator_t *it)
 {
-  	return it->current_bucket == No_Buckets;
+  	return it->current_bucket == it->ht->bucket_count;
 }
 
 /// @brief Move the iterator forward to the next entry if it exists or to at-the-end if no more entries exist

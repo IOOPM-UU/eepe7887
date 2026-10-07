@@ -39,8 +39,19 @@ struct hash_table
 
 
 /// @brief Create a new hash table
+/// @param hash_fn hashing function used for hashing
+/// @param key_eq_fn equality function 
 /// @return A new empty hash table
 ioopm_hash_table_t *ioopm_hash_table_create(ioopm_hash_function *hash_fn, ioopm_eq_function *key_eq_fn);
+
+
+/// @brief 
+/// @param hash_fn 
+/// @param key_eq_fn 
+/// @param capacity 
+/// @param load_factor 
+/// @return 
+ioopm_hash_table_t *ioopm_modular_hash_table_create(ioopm_hash_function *hash_fn, ioopm_eq_function *key_eq_fn, size_t capacity, float load_factor);
 
 /// @brief Delete a hash table and free its memory
 /// @param ht a hash table to be deleted

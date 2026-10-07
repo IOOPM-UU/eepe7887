@@ -63,7 +63,7 @@ void ioopm_hash_table_iterator_destroy(ioopm_hash_table_iterator_t *it)
   	free(it);
 }
 
-bool ioopm_hash_table_iterator_at_end(ioopm_hash_table_iterator_t *it)
+bool ioopm_hash_table_iterator_at_end(const ioopm_hash_table_iterator_t *it)
 {
   	return it->current_bucket == it->ht->bucket_count;
 }
@@ -75,12 +75,12 @@ void ioopm_hash_table_iterator_advance(ioopm_hash_table_iterator_t *it)
 }
 
 
-elem_t *ioopm_hash_table_iterator_current_key(ioopm_hash_table_iterator_t *it)
+elem_t *ioopm_hash_table_iterator_current_key(const ioopm_hash_table_iterator_t *it)
 {
   	return &it->current_entry->key;
 }
 
-elem_t ioopm_hash_table_iterator_current_value(ioopm_hash_table_iterator_t *it)
+elem_t ioopm_hash_table_iterator_current_value(const ioopm_hash_table_iterator_t *it)
 {
   	return it->current_entry->value;
 }

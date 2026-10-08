@@ -1,0 +1,294 @@
+        -:    0:Source:hash_table.c
+        -:    0:Graph:hash_table.gcno
+        -:    0:Data:hash_table.gcda
+        -:    0:Runs:1
+        -:    1:#include "hash_table.h"
+        -:    2:#include "common.h"
+        -:    3:#include "hash_table_iterator.h"
+        -:    4:#include <stddef.h>
+        -:    5:#include <stdlib.h>
+        -:    6:#include <stdbool.h>
+        -:    7:#include <string.h>
+        -:    8:#include <ctype.h>
+        -:    9:#define No_Buckets 17
+        -:   10:#define int_elem(x)   ((elem_t) { .i = (x) })
+        -:   11:#define bool_elem(x)  ((elem_t) { .b = (x) })
+        -:   12:#define ptr_elem(x)   ((elem_t) { .p = (x) })
+        -:   13:#define string_elem(x) ((elem_t) { .s = (x) })
+        -:   14:
+        -:   15:
+        -:   16:
+        -:   17:
+        -:   18:
+        -:   19:
+        -:   20:
+function entry_create called 1024 returned 100% blocks executed 100%
+     1024:   21:static entry_t *entry_create(const elem_t *key, elem_t value, entry_t *next)
+        -:   22:{
+     1024:   23:  	entry_t *entry = calloc(1, sizeof(entry_t));
+     1024:   24:  	entry->key = *key;
+     1024:   25:  	entry->value = value;
+     1024:   26:  	entry->next = next;
+     1024:   27:  	return entry;
+        -:   28:}
+        -:   29:
+        -:   30:/// @brief Creates a hashtable
+        -:   31:/// @param hash_fn hashing function used to hash all of the keys
+        -:   32:/// @param key_eq_fn equality function to check equality between keys
+        -:   33:/// @return hashtable
+function ioopm_hash_table_create called 17 returned 100% blocks executed 100%
+       17:   34:ioopm_hash_table_t *ioopm_hash_table_create(ioopm_hash_function *hash_fn, ioopm_eq_function *key_eq_fn)
+        -:   35:{
+       17:   36:  	ioopm_hash_table_t *ht = calloc(1, sizeof(ioopm_hash_table_t));
+       17:   37:	ht->buckets = calloc(No_Buckets, sizeof(entry_t));  	
+       17:   38:	ht->hash_fn = hash_fn;
+       17:   39:  	ht->key_eq_fn = key_eq_fn;
+       17:   40:	ht->load_factor = 0.75;
+       17:   41:	ht->bucket_count = No_Buckets;
+       17:   42:  	return ht;
+        -:   43:}
+        -:   44:/*
+        -:   45:ioopm_hash_table_t *ioopm_modular_hash_table_create(ioopm_hash_function *hash_fn, ioopm_eq_function *key_eq_fn, size_t size, float load_factor)
+        -:   46:{
+        -:   47:	
+        -:   48:
+        -:   49:	ioopm_hash_table_t *ht = calloc(1, sizeof(ioopm_hash_table_t));
+        -:   50:	ht->hash_fn = hash_fn;
+        -:   51:  	ht->key_eq_fn = key_eq_fn;
+        -:   52:	ht->load_factor = load_factor;
+        -:   53:	ht->size = size;
+        -:   54:	return ht;
+        -:   55:}
+        -:   56:*/
+        -:   57:
+function size_check called 1026 returned 100% blocks executed 100%
+     1026:   58:bool size_check(ioopm_hash_table_t *ht)
+        -:   59:{
+     1026:   60:	return ht->size >= ht->bucket_count * ht->load_factor;
+        -:   61:}
+        -:   62:
+        -:   63:
+        -:   64:
+function entry_destroy called 1024 returned 100% blocks executed 100%
+     1024:   65:static entry_t *entry_destroy(entry_t *entry)
+        -:   66:{
+     1024:   67:  	entry_t *next = entry->next;
+     1024:   68:  	free(entry);
+     1024:   69:  	entry = next;
+     1024:   70:  	return entry; // Returns the next element while freeing the entry we want to destroy
+        -:   71:}
+        -:   72:
+        -:   73:/// @brief destroys the hashtable
+        -:   74:/// @param ht the hashtable to be destroyed
+function ioopm_hash_table_destroy called 17 returned 100% blocks executed 100%
+       17:   75:void ioopm_hash_table_destroy(ioopm_hash_table_t *ht)
+        -:   76:{
+     2342:   77: 	for (size_t i = 0; i < ht->bucket_count; i++)
+branch  0 taken 2325
+branch  1 taken 17 (fallthrough)
+        -:   78:  	{
+     2325:   79:    	entry_t *current = ht->buckets[i].next;
+     2846:   80:     	while (current != NULL)
+branch  0 taken 521
+branch  1 taken 2325 (fallthrough)
+        -:   81:    	{
+      521:   82:      		current = entry_destroy(current);
+call    0 returned 521
+        -:   83:     	}
+        -:   84:   	}
+       17:   85:	free(ht->buckets);
+       17:   86:   	free(ht);
+       17:   87:}
+        -:   88:
+function resize called 7 returned 100% blocks executed 93%
+        7:   89:static void resize(ioopm_hash_table_t *ht)
+        -:   90:{
+        -:   91:
+        7:   92:	size_t primes[] = {17, 31, 67, 127, 257, 509, 1021, 2053, 4099, 8191, 16381};
+        7:   93:	size_t array_size = sizeof(primes) / sizeof(primes[0]); 
+        7:   94:	size_t i = 0;
+       35:   95:	while (i < array_size && primes[i] <= ht->bucket_count)
+branch  0 taken 35 (fallthrough)
+branch  1 taken 0
+branch  2 taken 28
+branch  3 taken 7 (fallthrough)
+        -:   96:	{
+       28:   97:    	i++;
+        -:   98:	}
+        7:   99:	if (i == array_size)
+branch  0 taken 0 (fallthrough)
+branch  1 taken 7
+        -:  100:	{
+    #####:  101:    	return; 
+        -:  102:	}
+        -:  103:
+        7:  104:	size_t new_count = primes[i];
+        7:  105:	size_t old_buckets = ht->bucket_count;
+        7:  106:	entry_t *old_entries = ht->buckets;
+        -:  107:
+        7:  108:	ht->buckets = calloc(new_count, sizeof(entry_t));
+        7:  109:	ht->bucket_count = new_count;
+        -:  110:	
+     2036:  111:	for(size_t i = 0; i < old_buckets; i++)
+branch  0 taken 2029
+branch  1 taken 7 (fallthrough)
+        -:  112:	{
+     2029:  113:		entry_t *current = old_entries[i].next;
+     3554:  114:		while(current != NULL)
+branch  0 taken 1525
+branch  1 taken 2029 (fallthrough)
+        -:  115:		{
+     1525:  116:			entry_t *next = current->next;
+     1525:  117:      		size_t modul = ht->hash_fn(current->key) % new_count;
+call    0 returned 1525
+     1525:  118:      		current->next = ht->buckets[modul].next; 
+     1525:  119:      		ht->buckets[modul].next = current;
+     1525:  120:      		current = next;
+        -:  121:		}
+        -:  122:
+        -:  123:    }
+        7:  124:	free(old_entries);
+        -:  125:}
+        -:  126:
+function find_previous_entry called 4056 returned 100% blocks executed 100%
+     4056:  127:static entry_t *find_previous_entry(ioopm_hash_table_t *ht, const elem_t *key)
+        -:  128:{
+     4056:  129:	size_t bucket = ht->hash_fn(*key) % ht->bucket_count;
+call    0 returned 4056
+        -:  130:
+     4056:  131:	entry_t *previous = &ht->buckets[bucket];
+     4056:  132:	entry_t *current = ht->buckets[bucket].next;
+     4061:  133:	while (current != NULL && !ht->key_eq_fn(current->key, *key))
+branch  0 taken 2526 (fallthrough)
+branch  1 taken 1535
+call    2 returned 2526
+branch  3 taken 5
+branch  4 taken 2521 (fallthrough)
+        -:  134:	{
+        5:  135:   		previous = current;
+        5:  136:     	current = current->next;
+        -:  137:    }
+     4056:  138:    return previous;
+        -:  139:}
+        -:  140:
+function ioopm_hash_table_insert called 1026 returned 100% blocks executed 100%
+     1026:  141:void ioopm_hash_table_insert(ioopm_hash_table_t *ht, const elem_t *key, elem_t value)
+        -:  142:{
+     1026:  143:	if(size_check(ht))
+call    0 returned 1026
+branch  1 taken 7 (fallthrough)
+branch  2 taken 1019
+        -:  144:	{
+        7:  145:		resize(ht);
+call    0 returned 7
+        -:  146:	}
+     1026:  147:  	entry_t *previous = find_previous_entry(ht, key);
+call    0 returned 1026
+        -:  148:
+     1026:  149:   	if (previous->next != NULL)
+branch  0 taken 2 (fallthrough)
+branch  1 taken 1024
+        -:  150:    {
+        2:  151:    	previous->next->value = value;
+        -:  152:    }
+        -:  153:    else
+        -:  154:    {
+     1024:  155:		ht->size++;
+     1024:  156:      	previous->next = entry_create(key, value, NULL);
+call    0 returned 1024
+        -:  157:    }
+     1026:  158:}
+        -:  159:
+function ioopm_hash_table_lookup called 2526 returned 100% blocks executed 100%
+     2526:  160:bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, const elem_t *key, elem_t *result)
+        -:  161:{
+     2526:  162:	entry_t *previous = find_previous_entry(ht, key);
+call    0 returned 2526
+        -:  163:  	// if the key exists, return the value, otherwise, indicate that the lookup failed
+     2526:  164:	if (previous->next != NULL)
+branch  0 taken 2016 (fallthrough)
+branch  1 taken 510
+        -:  165:  	{
+     2016:  166:    	*result = previous->next->value;
+     2016:  167:    	return true;
+        -:  168:  	}
+        -:  169:  	else
+        -:  170:  	{
+      510:  171:    	return false;
+        -:  172:  	}
+        -:  173:}
+        -:  174:
+function ioopm_hash_table_remove called 504 returned 100% blocks executed 100%
+      504:  175:bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, const elem_t *key)
+        -:  176:{
+        -:  177:  	elem_t result;
+      504:  178:   	entry_t *previous = find_previous_entry(ht, key);
+call    0 returned 504
+        -:  179:
+      504:  180:    if (ioopm_hash_table_lookup(ht, key, &result))
+call    0 returned 504
+branch  1 taken 503 (fallthrough)
+branch  2 taken 1
+        -:  181:    {
+      503:  182:    	previous->next = entry_destroy(previous->next);
+call    0 returned 503
+      503:  183:		ht->size--;
+      503:  184:     	return true;
+        -:  185:    }
+        -:  186:    else
+        -:  187:    {
+        1:  188:    	return false;
+        -:  189:    }
+        -:  190:}
+        -:  191:
+        -:  192:
+function ioopm_hash_table_has_key called 1012 returned 100% blocks executed 100%
+     1012:  193:bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, const elem_t *key)
+        -:  194:{
+        -:  195:  	elem_t result;
+     1012:  196:   	return ioopm_hash_table_lookup(ht, key, &result);
+call    0 returned 1012
+        -:  197:}
+        -:  198:
+        -:  199:
+function ioopm_hash_table_is_empty called 5 returned 100% blocks executed 100%
+        5:  200:bool ioopm_hash_table_is_empty(const ioopm_hash_table_t *ht)
+        -:  201:{
+       62:  202:  	for(size_t i = 0; i < ht->bucket_count; i++)
+branch  0 taken 60
+branch  1 taken 2 (fallthrough)
+        -:  203:   	{
+       60:  204:    	entry_t *bucket = ht->buckets[i].next;
+       60:  205:     	if(bucket != NULL)
+branch  0 taken 3 (fallthrough)
+branch  1 taken 57
+        -:  206:    	{
+        3:  207:      		return false;
+        -:  208:     	}
+        -:  209:    }
+        2:  210:   	return true;
+        -:  211:}
+        -:  212:
+        -:  213:
+function ioopm_hash_table_size called 9 returned 100% blocks executed 100%
+        9:  214:size_t ioopm_hash_table_size(const ioopm_hash_table_t *ht)
+        -:  215:{
+        9:  216:  	size_t size = 0;
+        -:  217:
+     6270:  218:   	for(size_t i = 0; i < ht->bucket_count; i++)
+branch  0 taken 6261
+branch  1 taken 9 (fallthrough)
+        -:  219:    {
+     6261:  220:    	entry_t *bucket = ht->buckets[i].next;
+     8769:  221:     	while(bucket != NULL)
+branch  0 taken 2508
+branch  1 taken 6261 (fallthrough)
+        -:  222:      	{
+     2508:  223:      		entry_t *next = bucket->next;
+     2508:  224:       		bucket = next;
+     2508:  225:         	size++;
+        -:  226:       	}
+        -:  227:    }
+        9:  228:    return size;
+        -:  229:}
+        -:  230:

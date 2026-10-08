@@ -4,7 +4,7 @@ LCUNIT = -lcunit
 
 
 
-HASH_OBJECTS=hash_table_test.o hash_table.o hash_table_iterator.o utils.o
+HASH_OBJECTS=hash_table_test.o hash_table.o utils.o
 HASH_HEADERS=hash_table.h utils.h hash_table_iterator.h
 
 $(HASH_OBJECTS): $(HASH_HEADERS)

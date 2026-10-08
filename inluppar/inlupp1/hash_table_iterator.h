@@ -1,4 +1,3 @@
-
 #pragma once
 #include <stdbool.h>
 #include "hash_table.h"
@@ -15,13 +14,6 @@
 * If the underlying hash table of an iterator is modified using any non-iterator function, the iterator is invalidated and should not be used anymore.
 *
 */
-
-struct hash_table_iterator
-{
-  	ioopm_hash_table_t *ht;
-  	size_t current_bucket;
-  	entry_t *current_entry;
-};
 
 typedef struct hash_table_iterator ioopm_hash_table_iterator_t;
 

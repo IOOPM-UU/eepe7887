@@ -173,9 +173,6 @@ bool ioopm_list_is_empty(ioopm_list_t *list)
     return list->first->next == list->last;   
 }
 
-
-
-
 struct list_iterator 
 {
     ioopm_list_t *list;
@@ -207,10 +204,11 @@ bool ioopm_list_iterator_advance(ioopm_list_iterator_t *iter)
 {
     if(!ioopm_list_iterator_at_end(iter))
     {
-    iter->link = iter->link->next;
-    return true;
+        iter->link = iter->link->next;
+        return true;
     }
-return false;
+
+    return false;
 }
 
 
@@ -227,8 +225,6 @@ elem_t ioopm_list_iterator_remove(ioopm_list_iterator_t *iter)
     link_t *tmp = iter->link;
     iter->link->next->previous = tmp->previous;
     iter->link->previous->next = tmp->next;
-
-  
 
     iter->link = (tmp->next == iter->list->last)
      ? tmp->previous 

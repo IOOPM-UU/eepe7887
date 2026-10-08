@@ -14,7 +14,7 @@ LINK_HEADERS=linked_list.h list_iterator.h common.h
 
 $(LINK_OBJECTS):$(LINK_HEADERS)
 
-FREQ_OBJECTS=freq_count.o hash_table.o linked_list.o utils.o
+FREQ_OBJECTS=freq_count.o hash_table.o linked_list.o utils.o hash_table_iterator.o
 
 $(FREQ_OBJECTS): $(HASH_HEADERS)
 

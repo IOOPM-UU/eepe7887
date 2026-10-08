@@ -66,7 +66,6 @@ bool ioopm_hash_table_iterator_at_end(const ioopm_hash_table_iterator_t *it)
 void ioopm_hash_table_iterator_advance(ioopm_hash_table_iterator_t *it)
 {
   	advance_iterator_state(it);
-   	skip_empty_buckets(it);
 }
 
 elem_t *ioopm_hash_table_iterator_current_key(const ioopm_hash_table_iterator_t *it)

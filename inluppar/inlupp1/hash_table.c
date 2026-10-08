@@ -124,10 +124,6 @@ static entry_t **find_link(ioopm_hash_table_t *ht, const elem_t *key)
 
 void ioopm_hash_table_insert(ioopm_hash_table_t *ht, const elem_t *key, elem_t value)
 {
-	if(growth_check(ht))
-	{
-		rehash(ht);
-	}
   	entry_t **link = find_link(ht, key);
 
    	if (*(link) != NULL)
@@ -138,6 +134,11 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, const elem_t *key, elem_t v
     {
 		ht->size++;
       	*link = entry_create(key, value, NULL);
+
+		if(growth_check(ht))
+		{
+			rehash(ht);
+		}
     }
 }
 

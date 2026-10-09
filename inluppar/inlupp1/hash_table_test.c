@@ -4,7 +4,6 @@
 #include <string.h>
 #include <stdbool.h>
 #include "utils.h"
-#define No_Buckets 17
 #define int_elem(x)   ((elem_t) { .i = (x) })
 #define bool_elem(x)  ((elem_t) { .b = (x) })
 #define ptr_elem(x)   ((elem_t) { .p = (x) })
@@ -25,6 +24,16 @@ static size_t string_hash(elem_t key)
 static bool string_eq(elem_t a, elem_t b)
 {
   return strcmp(a.s, b.s) == 0;
+}
+
+static size_t int_hash(elem_t key)
+{
+  return (size_t) key.i;
+}
+
+static bool int_eq(elem_t a, elem_t b)
+{
+  return a.i == b.i;
 }
 
 static ioopm_hash_table_t *create_ht(void)
@@ -352,15 +361,6 @@ void test_entries_in_same_bucket()
   CU_ASSERT_EQUAL(iteration_count, 3);
 }
 
-static size_t int_hash(elem_t key)
-{
-  return (size_t) key.i;
-}
-
-static bool int_eq(elem_t a, elem_t b)
-{
-  return a.i == b.i;
-}
 
 void test_int_keys()
 {
@@ -387,7 +387,7 @@ void test_int_keys()
 void test_resize_many_entries()
 {
   const int N = 1000;
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(int_hash, int_eq);
+  ioopm_hash_table_t *ht = ioopm_modular_hash_table_create(int_hash, int_eq, 17, 0.75);
   size_t initial_buckets = ht->bucket_count;
 
   // 1. Sätt in många nycklar (tillräckligt för att passera load factor flera gånger)
@@ -450,6 +450,96 @@ void test_resize_many_entries()
   ioopm_hash_table_destroy(ht);
 }
 
+void test_resize_beyond_prime_array()
+{
+  const size_t largest_prime = 16381;
+  const float load_factor = 0.01f;
+  const int N = 200;   // 16381 * 0.01 ≈ 163, så 200 passerar gränsen
+
+  ioopm_hash_table_t *ht = ioopm_modular_hash_table_create(int_hash, int_eq, 17, load_factor);
+  CU_ASSERT_EQUAL(ht->bucket_count, 17);
+
+  for (int i = 0; i < N; i++)
+  {
+    elem_t key = int_elem(i);
+    ioopm_hash_table_insert(ht, &key, int_elem(i * 2));
+  }
+
+  // Tabellen har vuxit genom hela primtalsarrayen och stannat på det sista
+  CU_ASSERT_EQUAL(ht->bucket_count, largest_prime);
+  CU_ASSERT_EQUAL(ht->size, (size_t) N);
+  CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), (size_t) N);
+
+  // Alla nycklar ska finnas kvar efter alla rehash
+  for (int i = 0; i < N; i++)
+  {
+    elem_t key = int_elem(i);
+    elem_t result = int_elem(-1);
+    CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, &key, &result));
+    CU_ASSERT_EQUAL(result.i, i * 2);
+  }
+
+  elem_t missing = int_elem(N + 1);
+  CU_ASSERT_FALSE(ioopm_hash_table_has_key(ht, &missing));
+
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_many_entries_slow()
+{
+  const int N = 100000;
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(int_hash, int_eq);
+
+  // Sätt in många nycklar (kedjorna blir långa med 17 buckets)
+  for (int i = 0; i < N; i++)
+  {
+    elem_t key = int_elem(i);
+    ioopm_hash_table_insert(ht, &key, int_elem(i * 10));
+  }
+  CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), N);
+
+  // Slå upp alla nycklar
+  int all_found = 0;
+  for (int i = 0; i < N; i++)
+  {
+    elem_t key = int_elem(i);
+    elem_t result = int_elem(-1);
+    if (ioopm_hash_table_lookup(ht, &key, &result) && result.i == i * 10)
+    {
+      all_found++;
+    }
+  }
+  CU_ASSERT_EQUAL(all_found, N);
+
+  // Nycklar som saknas (hela kedjan genomsöks)
+  int missing = 0;
+  for (int i = N; i < N + N / 2; i++)
+  {
+    elem_t key = int_elem(i);
+    if (!ioopm_hash_table_has_key(ht, &key))
+    {
+      missing++;
+    }
+  }
+  CU_ASSERT_EQUAL(missing, N / 2);
+
+  // Ta bort varannan nyckel
+  int removed = 0;
+  for (int i = 0; i < N; i += 2)
+  {
+    elem_t key = int_elem(i);
+    if (ioopm_hash_table_remove(ht, &key))
+    {
+      removed++;
+    }
+  }
+  CU_ASSERT_EQUAL(removed, N / 2);
+  CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), N / 2);
+
+  ioopm_hash_table_destroy(ht);
+}
+
+
 int main()
 {
   if (CU_initialize_registry() != CUE_SUCCESS)
@@ -480,7 +570,9 @@ int main()
     (CU_add_test(my_test_suite, "Test remove no exist", test_remove_noexist_entry) == NULL) ||
     (CU_add_test(my_test_suite, "Test insert inuse", test_insert_inuse) == NULL ||
     CU_add_test(my_test_suite, "Test int keys", test_int_keys) == NULL ||
-    CU_add_test(my_test_suite, "Test resize with many entries", test_resize_many_entries) == NULL)
+    CU_add_test(my_test_suite, "Test resize with many entries", test_resize_many_entries) == NULL ||
+    CU_add_test(my_test_suite, "Test resize beyond prime array", test_resize_beyond_prime_array) == NULL ||
+    CU_add_test(my_test_suite, "Test resize many entries test slow", test_many_entries_slow) == NULL)
   )
   {
     CU_cleanup_registry();

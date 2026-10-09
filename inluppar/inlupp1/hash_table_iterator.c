@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include <ctype.h>
+#define No_Buckets 17
+
 
 
 /**
@@ -43,6 +45,10 @@ static void advance_iterator_state(ioopm_hash_table_iterator_t *it)
 	skip_empty_buckets(it);
 }
 
+
+/// @brief Create an iterator for a hash table.
+/// @param ht hash table to iterate over
+/// @return a new iterator positioned at the first entry if it exists, and positioned at-the-end if ht is empty
 ioopm_hash_table_iterator_t *ioopm_hash_table_iterator_create(ioopm_hash_table_t *ht)
 {
     ioopm_hash_table_iterator_t *it = calloc(1, sizeof(ioopm_hash_table_iterator_t));
@@ -63,6 +69,9 @@ bool ioopm_hash_table_iterator_at_end(const ioopm_hash_table_iterator_t *it)
   	return it->current_bucket == it->ht->bucket_count;
 }
 
+/// @brief Move the iterator forward to the next entry if it exists or to at-the-end if no more entries exist
+/// @pre it is positioned at an entry
+/// @param it iterator operated upon
 void ioopm_hash_table_iterator_advance(ioopm_hash_table_iterator_t *it)
 {
   	advance_iterator_state(it);
@@ -77,4 +86,3 @@ elem_t ioopm_hash_table_iterator_current_value(const ioopm_hash_table_iterator_t
 {
   	return it->current_entry->value;
 }
-

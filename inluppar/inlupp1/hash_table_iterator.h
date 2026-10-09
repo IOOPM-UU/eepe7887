@@ -1,4 +1,3 @@
-
 #pragma once
 #include <stdbool.h>
 #include "hash_table.h"

@@ -1,6 +1,6 @@
 #include "hash_table.h"
 #include "common.h"
-#include "hash_table_iterator.h"
+//#include "hash_table_iterator.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -68,8 +68,8 @@ void ioopm_hash_table_destroy(ioopm_hash_table_t *ht)
       		current = entry_destroy(current);
      	}
    	}
-	free(ht->buckets);
-   	free(ht);
+   	free(ht->buckets);
+	free(ht);
 }
 
 static void rehash(ioopm_hash_table_t *ht)

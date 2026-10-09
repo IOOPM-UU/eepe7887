@@ -19,6 +19,8 @@ Minneskontroll och täckning:
 
 ## Köra frekvensräknaren
 
+    make freq_count     # kompilera filen 'freq_count.c'
+
     make 1k-words       # freq_count med .txt fil som har 1000 långa ord
     make 10k-words      # freq_count med .txt fil som har 10000 ord
     make 16k-words      # freq_count med .txt fil som har 16000 ord

@@ -1,0 +1,302 @@
+        -:    0:Source:linked_list.c
+        -:    1:#include <stdbool.h>
+        -:    2:#include <stdlib.h>
+        -:    3:#include "linked_list.h"
+        -:    4:#include "list_iterator.h"
+        -:    5:#include "common.h"
+        -:    6:#define int_elem(x)   ((elem_t) { .i = (x) })
+        -:    7:#define bool_elem(x)  ((elem_t) { .b = (x) })
+        -:    8:#define ptr_elem(x)   ((elem_t) { .p = (x) })
+        -:    9:#define string_elem(x) ((elem_t) { .s = (x) })
+        -:   10:
+        -:   11:struct link 
+        -:   12:{
+        -:   13:    link_t *previous;
+        -:   14:    elem_t value;
+        -:   15:    link_t *next;
+        -:   16:};
+        -:   17:
+        -:   18:struct list 
+        -:   19:{
+        -:   20:    link_t *first;
+        -:   21:    link_t *last;
+        -:   22:    size_t size;
+        -:   23:};
+        -:   24:
+        -:   25:typedef struct list ioopm_list_t;
+function link_create called 273 returned 100% blocks executed 100%
+      273:   26:link_t *link_create(elem_t value, link_t *previous, link_t *next)
+        -:   27:{
+      273:   28:    link_t *link = calloc(1, sizeof(link_t));
+      273:   29:    link->previous = previous;
+      273:   30:    link->value = value;
+      273:   31:    link->next = next;
+      273:   32:    return link;
+        -:   33:}
+        -:   34:
+function ioopm_list_create called 63 returned 100% blocks executed 100%
+       63:   35:ioopm_list_t *ioopm_list_create(void)
+        -:   36:{
+       63:   37:    ioopm_list_t *list = calloc(1, sizeof(ioopm_list_t));
+        -:   38:
+       63:   39:    link_t *head = link_create(int_elem(0), NULL, NULL);
+call    0 returned 63
+       63:   40:    link_t *tail = link_create(int_elem(0), head, NULL);
+call    0 returned 63
+        -:   41:
+       63:   42:    head->next = tail;
+       63:   43:    list->first = head;
+       63:   44:    list->last = tail;
+       63:   45:    list->size = 0;
+        -:   46:
+       63:   47:    return list;
+        -:   48:}
+        -:   49:
+function link_destroy called 192 returned 100% blocks executed 100%
+      192:   50:link_t *link_destroy(link_t *link)
+        -:   51:{   
+      192:   52:    link_t *tmp = link->next;
+      192:   53:    free(link);
+      192:   54:    link = tmp;
+      192:   55:    return link;
+        -:   56:    
+        -:   57:}
+        -:   58:
+        -:   59:
+function ioopm_list_destroy called 63 returned 100% blocks executed 100%
+       63:   60:void ioopm_list_destroy(ioopm_list_t *list)
+        -:   61:{
+       63:   62:    link_t *first_link = list->first;
+        -:   63:    
+      255:   64:    while(first_link != list->last)
+branch  0 taken 192
+branch  1 taken 63 (fallthrough)
+        -:   65:    {
+      192:   66:        first_link = link_destroy(first_link);
+call    0 returned 192
+        -:   67:    }
+        -:   68:
+       63:   69:    free(first_link);
+       63:   70:    free(list);
+       63:   71:}
+        -:   72:
+function ioopm_list_append called 75 returned 100% blocks executed 100%
+       75:   73:void ioopm_list_append(ioopm_list_t *list, elem_t value)
+        -:   74:{
+       75:   75:    link_t *link = link_create(value, list->last->previous, list->last);
+call    0 returned 75
+       75:   76:    list->last->previous->next = link;
+       75:   77:    list->last->previous = link;
+       75:   78:    list->size = list->size + 1;
+        -:   79:
+       75:   80:}
+        -:   81:
+function ioopm_list_prepend called 24 returned 100% blocks executed 100%
+       24:   82:void ioopm_list_prepend(ioopm_list_t *list, elem_t value)
+        -:   83:{
+       24:   84:    link_t *link = link_create(value, list->first, list->first->next);
+call    0 returned 24
+       24:   85:    list->first->next->previous = link;
+       24:   86:    list->first->next = link;
+       24:   87:    list->size = list->size + 1;
+       24:   88:}
+        -:   89:
+        -:   90:
+function ioopm_list_head called 30 returned 100% blocks executed 100%
+       30:   91:elem_t ioopm_list_head(ioopm_list_t *list)
+        -:   92:{
+       30:   93:    return list->first->next->value;
+        -:   94:}
+        -:   95:
+function ioopm_list_last called 24 returned 100% blocks executed 100%
+       24:   96:elem_t ioopm_list_last(ioopm_list_t *list)
+        -:   97:{
+       24:   98:    return list->last->previous->value;
+        -:   99:}
+        -:  100:
+function ioopm_list_insert called 6 returned 100% blocks executed 100%
+        6:  101:void ioopm_list_insert(ioopm_list_t *list, size_t index, elem_t value)
+        -:  102:{
+        -:  103:    
+        6:  104:    if(index <= list->size)
+branch  0 taken 6 (fallthrough)
+branch  1 taken 0
+        -:  105:    {
+        6:  106:        link_t *first_link = list->first->next;
+        -:  107:
+       12:  108:        for(size_t i = 0; i < index; i++)
+branch  0 taken 6
+branch  1 taken 6 (fallthrough)
+        -:  109:        {
+        6:  110:            first_link = first_link->next;
+        -:  111:        }
+        6:  112:        link_t *link = link_create(value, first_link->previous, first_link);
+call    0 returned 6
+        6:  113:        first_link->previous->next = link;
+        6:  114:        first_link->previous = link;
+        6:  115:        list->size = list->size + 1;
+        -:  116:    }   
+        6:  117:}
+        -:  118:
+        -:  119:
+        -:  120:
+function ioopm_list_remove called 27 returned 100% blocks executed 100%
+       27:  121:elem_t ioopm_list_remove(ioopm_list_t *list, size_t index)
+        -:  122:{
+       27:  123:    link_t *first_link = list->first->next;
+       27:  124:    size_t i = 0;
+        -:  125:
+        -:  126:
+       51:  127:    while(first_link != list->last)
+branch  0 taken 42
+branch  1 taken 9 (fallthrough)
+        -:  128:    {
+       42:  129:        if(i == index)
+branch  0 taken 18 (fallthrough)
+branch  1 taken 24
+        -:  130:
+        -:  131:        {   
+       18:  132:            link_t *tmp_link_1 = first_link->next;
+       18:  133:            link_t *tmp_link_2 = first_link->previous;
+        -:  134:
+       18:  135:            first_link->previous->next = tmp_link_1;
+       18:  136:            first_link->next->previous = tmp_link_2;
+       18:  137:            elem_t tmp = first_link->value;
+       18:  138:            list->size = list->size - 1;
+       18:  139:            free(first_link);
+       18:  140:            return tmp;
+        -:  141:        }
+       24:  142:        first_link = first_link->next;
+       24:  143:        i++;
+        -:  144:    }
+        9:  145:    return list->last->value;   //If the index is not found, return the value of the sentinel node
+        -:  146:}
+        -:  147:
+function ioopm_list_get called 51 returned 100% blocks executed 100%
+       51:  148:elem_t ioopm_list_get(ioopm_list_t *list, size_t index)
+        -:  149:{
+       51:  150:    link_t *first_link = list->first->next;
+        -:  151:
+       51:  152:    size_t i = 0;
+      105:  153:    while(first_link != list->last)
+branch  0 taken 96
+branch  1 taken 9 (fallthrough)
+        -:  154:    {
+       96:  155:        if(i == index)
+branch  0 taken 42 (fallthrough)
+branch  1 taken 54
+        -:  156:        {
+       42:  157:            return first_link->value;
+        -:  158:        }
+       54:  159:        first_link = first_link->next;
+       54:  160:        i++;
+        -:  161:    }
+        -:  162:
+        9:  163:    return list->last->value;   //If the index is not found, return the value of the sentinel node
+        -:  164:}
+        -:  165:
+function ioopm_list_size called 33 returned 100% blocks executed 100%
+       33:  166:size_t ioopm_list_size(ioopm_list_t *list)
+        -:  167:{
+       33:  168:    return list->size;
+        -:  169:}
+        -:  170:
+function ioopm_list_is_empty called 3 returned 100% blocks executed 100%
+        3:  171:bool ioopm_list_is_empty(ioopm_list_t *list)
+        -:  172:{
+        3:  173:    return list->first->next == list->last;   
+        -:  174:}
+        -:  175:
+        -:  176:struct list_iterator 
+        -:  177:{
+        -:  178:    ioopm_list_t *list;
+        -:  179:    link_t *link;
+        -:  180:};
+        -:  181:
+function ioopm_list_iterator_create called 21 returned 100% blocks executed 100%
+       21:  182:ioopm_list_iterator_t *ioopm_list_iterator_create(ioopm_list_t *l)
+        -:  183:{
+       21:  184:    ioopm_list_iterator_t *it = calloc(1, sizeof(ioopm_list_iterator_t));
+       21:  185:    it->list = l;
+       21:  186:    it->link = l->first;
+       21:  187:    return it;
+        -:  188:}
+        -:  189:
+function ioopm_list_iterator_destroy called 21 returned 100% blocks executed 100%
+       21:  190:void ioopm_list_iterator_destroy(ioopm_list_iterator_t *iter)
+        -:  191:{
+       21:  192:    free(iter);
+       21:  193:}
+        -:  194:
+function ioopm_list_iterator_at_end called 24 returned 100% blocks executed 100%
+       24:  195:bool ioopm_list_iterator_at_end(ioopm_list_iterator_t *iter)
+        -:  196:{
+       24:  197:    link_t *link = iter->link;
+       24:  198:    link_t *last_link = iter->list->last;
+        -:  199:
+       24:  200:    return link == last_link;
+        -:  201:}
+        -:  202:
+function ioopm_list_iterator_advance called 24 returned 100% blocks executed 100%
+       24:  203:bool ioopm_list_iterator_advance(ioopm_list_iterator_t *iter)
+        -:  204:{
+       24:  205:    if(!ioopm_list_iterator_at_end(iter))
+call    0 returned 24
+branch  1 taken 21 (fallthrough)
+branch  2 taken 3
+        -:  206:    {
+       21:  207:        iter->link = iter->link->next;
+       21:  208:        return true;
+        -:  209:    }
+        -:  210:
+        3:  211:    return false;
+        -:  212:}
+        -:  213:
+        -:  214:
+function ioopm_list_iterator_current called 42 returned 100% blocks executed 100%
+       42:  215:elem_t ioopm_list_iterator_current(ioopm_list_iterator_t *iter)
+        -:  216:{
+       42:  217:    elem_t value = iter->link->value;
+       42:  218:    return value;
+        -:  219:}
+        -:  220:
+function ioopm_list_iterator_remove called 6 returned 100% blocks executed 80%
+        6:  221:elem_t ioopm_list_iterator_remove(ioopm_list_iterator_t *iter)
+        -:  222:{
+        6:  223:    elem_t value = iter->link->value;
+        -:  224:
+        6:  225:    link_t *tmp = iter->link;
+        6:  226:    iter->link->next->previous = tmp->previous;
+        6:  227:    iter->link->previous->next = tmp->next;
+        -:  228:
+       12:  229:    iter->link = (tmp->next == iter->list->last)
+        -:  230:     ? tmp->previous 
+       6*:  231:     : tmp->next;
+branch  0 taken 0 (fallthrough)
+branch  1 taken 6
+        -:  232:
+        6:  233:    iter->list->size = iter->list->size - 1;
+        6:  234:    return value;
+        -:  235:
+        -:  236:}
+        -:  237:
+function ioopm_list_iterator_insert called 42 returned 100% blocks executed 100%
+       42:  238:void ioopm_list_iterator_insert(ioopm_list_iterator_t *iter, elem_t element)
+        -:  239:{
+       42:  240:    link_t *current_link = iter->link;
+       42:  241:    link_t *new_link =link_create(element, current_link, current_link->next);
+call    0 returned 42
+        -:  242:
+       42:  243:    current_link->next = new_link;
+       42:  244:    current_link->next->previous = new_link;
+        -:  245:
+       42:  246:    if(current_link == iter->list->first)
+branch  0 taken 18 (fallthrough)
+branch  1 taken 24
+        -:  247:    {
+       18:  248:        iter->link = new_link;
+        -:  249:    }
+        -:  250:
+       42:  251:    iter->list->size = iter->list->size + 1;
+        -:  252:
+       42:  253:}

@@ -29,16 +29,11 @@ static void skip_empty_buckets(ioopm_hash_table_iterator_t *it) {
     	it->current_bucket += 1;
 
      	// if the next bucket existed, update the current entry
-<<<<<<< HEAD
-      	if (it->current_bucket != No_Buckets)
-=======
       	if (it->current_bucket != it->ht->bucket_count)
->>>>>>> 0841002914dbbedde3759eeb447c4b23fa7c1c98
     	{
       		it->current_entry = it->ht->buckets[it->current_bucket];
      	}
     }
-<<<<<<< HEAD
 }
 
 static void advance_iterator_state(ioopm_hash_table_iterator_t *it)
@@ -49,19 +44,6 @@ static void advance_iterator_state(ioopm_hash_table_iterator_t *it)
 	// skip to the next non_empty bucket or the end if we're at the end of this bucket
 	skip_empty_buckets(it);
 }
-
-=======
-}
-
-static void advance_iterator_state(ioopm_hash_table_iterator_t *it)
-{
-  	// advance to the next entry in the bucket
-   	it->current_entry = it->current_entry->next;
-
-	// skip to the next non_empty bucket or the end if we're at the end of this bucket
-	skip_empty_buckets(it);
-}
->>>>>>> 0841002914dbbedde3759eeb447c4b23fa7c1c98
 
 
 /// @brief Create an iterator for a hash table.
@@ -84,7 +66,7 @@ void ioopm_hash_table_iterator_destroy(ioopm_hash_table_iterator_t *it)
 
 bool ioopm_hash_table_iterator_at_end(const ioopm_hash_table_iterator_t *it)
 {
-  	return it->current_bucket == No_Buckets;
+  	return it->current_bucket == it->ht->bucket_count;
 }
 
 /// @brief Move the iterator forward to the next entry if it exists or to at-the-end if no more entries exist

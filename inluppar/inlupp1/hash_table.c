@@ -60,7 +60,7 @@ static entry_t *entry_destroy(entry_t *entry)
 /// @param ht the hashtable to be destroyed
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht)
 {
- 	for (size_t i = 0; i < No_Buckets; i++)
+ 	for (size_t i = 0; i < ht->bucket_count; i++)
   	{
     	entry_t *current = ht->buckets[i];
      	while (current != NULL)
@@ -68,7 +68,8 @@ void ioopm_hash_table_destroy(ioopm_hash_table_t *ht)
       		current = entry_destroy(current);
      	}
    	}
-   	free(ht);
+   	free(ht->buckets);
+	free(ht);
 }
 
 static void rehash(ioopm_hash_table_t *ht)
@@ -111,7 +112,7 @@ static void rehash(ioopm_hash_table_t *ht)
 
 static entry_t **find_link(ioopm_hash_table_t *ht, const elem_t *key)
 {
-	size_t bucket = ht->hash_fn(*key) % No_Buckets;
+	size_t bucket = ht->hash_fn(*key) % ht->bucket_count;
 
 	entry_t **current = &(ht->buckets[bucket]); // ht->buckets[bucket] är bucketens första länk (platsen som innehåller en pekare till första entryn), '&' ger adressen till den
 	while (*current != NULL && !ht->key_eq_fn((*current)->key, *key)) // så länge länken pekar på en entry och entryns nyckel inte är den vi letar efter
@@ -181,7 +182,7 @@ bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, const elem_t *key)
 
 bool ioopm_hash_table_is_empty(const ioopm_hash_table_t *ht)
 {
-  	for(size_t i = 0; i < No_Buckets; i++)
+  	for(size_t i = 0; i < ht->bucket_count; i++)
    	{
     	entry_t *bucket = ht->buckets[i];
      	if(bucket != NULL)
